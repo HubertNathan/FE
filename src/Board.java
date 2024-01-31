@@ -10,7 +10,6 @@ public class Board {
         board = new Square[10][10];
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                System.out.println(i+"  "+j);
                 board[i][j] = new Square();
             }
         }
@@ -46,7 +45,7 @@ public class Board {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 String terrain = mapReader.getMap().get(width*i+j);
-                board[i][j] = new Square(mapReader.getTileSetData().getSubimage(16*(Integer.parseInt(terrain)%32), (Integer.parseInt(terrain)/32)*16,16,16));
+                board[i][j] = new Square(mapReader. getTileSetData().getSubimage(16*(Integer.parseInt(terrain)%32), (Integer.parseInt(terrain)/32)*16,16,16));
             }
         }
     }
@@ -64,6 +63,5 @@ public class Board {
     public static void main(String[] args) throws FileNotFoundException {
         int[][] types = {{0,1},{0,0}};
         Board b = new Board(new ReadMapFile());
-        System.out.println(b.get(0,0).image);
     }
 }
