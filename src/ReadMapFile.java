@@ -16,24 +16,22 @@ public class ReadMapFile {
     private int[] dimensions;
     private String tileSet;
     private BufferedImage tileSetData;
-    ReadMapFile() throws FileNotFoundException {
-        path = "MapGeneration/Maps/Plains/map.map";
+    ReadMapFile() {
+        path = "MapGeneration/Maps/CH1.map";
     }
-    ReadMapFile(String map) throws FileNotFoundException {
-        path = "MapGeneration/Maps/Plains/"+map;
+    ReadMapFile(String map) {
+        path = "MapGeneration/Maps/"+map;
     }
     public void load() throws FileNotFoundException {
         try {
             File mapFile = new File(path);
             Scanner mapReader = new Scanner(mapFile);
             tileSet = mapReader.nextLine();
-            System.out.println(tileSet);
             tileSetData = ImageIO.read(new File("MapGeneration/Tilesets/"+tileSet+".png"));
             dimensions = Stream.of(mapReader.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
             while (mapReader.hasNextLine()) {
                 map.addAll(Arrays.asList(mapReader.nextLine().split(" ")));
             }
-            System.out.println(map);
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
