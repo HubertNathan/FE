@@ -11,7 +11,7 @@ import javax.swing.*;
 import java.io.IOException;
 
 public class GameState  extends JPanel{
-    int FPS = 1000;
+    int FPS = 30;
     long refreshPeriod = (long) 1000000000/(FPS*1000000);
     int c = 0;
     KeyHandler KeyH;
@@ -34,7 +34,7 @@ public class GameState  extends JPanel{
             long lastTime = System.nanoTime();
             BV.repaint();
             long fps = -s/(lastTime - System.nanoTime());
-            Thread.sleep(refreshPeriod);
+            //Thread.sleep(refreshPeriod);
             lastTime = System.nanoTime();
         }
     }

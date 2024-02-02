@@ -66,15 +66,17 @@ public class BoardVisualizer extends JPanel{
         Dimension size = mainFrame.getSize();
         int w = size.width;
         int h = size.height;
+        super.paintComponents(g);
+        float W = (float) w/width;
+        float H = (float) (h-37)/(height);
         long fps = (long) 1000000000.0/(lastTime-System.nanoTime());
+        bufferImage = new BufferedImage((int)W* width,(int)H*height, BufferedImage.TYPE_INT_ARGB);
         lastTime = System.nanoTime();
         System.out.println("fps:"+fps);
         tileAnimStep=(tileAnimStep+1)%32;
         Graphics2D bufferImageGraphics = bufferImage.createGraphics();
+        bufferImageGraphics.drawImage(map,0,0,null);
         updateCursorAnimStep();
-        super.paintComponents(g);
-        float W = (float) w/width;
-        float H = (float) (h-37)/(height);
         Graphics2D g2 = (Graphics2D) g;
         update();
         for (int i = 0; i < height; i++) {
@@ -82,7 +84,7 @@ public class BoardVisualizer extends JPanel{
                 Unit unit = board.get(i,j).getUnit();
                 //board.draw(bufferImageGraphics,i,j,W,H);
                 if (board.get(i,j).isReachable()){board.draw(bufferImageGraphics,i,j,W,H, ColorSquaresMap.get(((tileAnimStep+2)/2)));}
-                /*if (unit != null){
+                if (unit != null){
                     if (unit.isOnCursor()) {
                         unit.draw(bufferImageGraphics, i, j, W, H, "select");
                     } else {
@@ -94,16 +96,17 @@ public class BoardVisualizer extends JPanel{
                     selector.draw(bufferImageGraphics,W,H,CursorMap.get(4));
                 } else selector.draw(bufferImageGraphics,W,H,CursorMap.get(cursorAnimState+1));
 
-                 */
+
             }
         }
         g2.drawImage(bufferImage,0,0,null);
         g2.dispose();
     }
     public void resizeImage(int newH, int newW) {
+        if (newH == 0 || newW == 0){return;}
         Image tmp = originalMap.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-        bufferImage = new BufferedImage(newH,newW,BufferedImage.TYPE_INT_ARGB);
-        Graphics g = bufferImage.getGraphics();
+        map = new BufferedImage(newH,newW,BufferedImage.TYPE_INT_ARGB);
+        Graphics g = map.getGraphics();
         g.drawImage(tmp,0,0,null);
         g.dispose();
     }
