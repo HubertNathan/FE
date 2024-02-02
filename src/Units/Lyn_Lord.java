@@ -10,7 +10,8 @@ public class Lyn_Lord extends Lord{
         load();
     }
     public void load() throws IOException {
-        movingSprites = ImageIO.read(new File("Sprites/Lord/Lyn/movingSprites.png"));
+        standingSprites = ImageIO.read(new File("Sprites/Lord/Lyn/standingSprites.png"));
+        selectSprites = ImageIO.read(new File("Sprites/Lord/Lyn/movingSprites.png"));
     }
 }
 
