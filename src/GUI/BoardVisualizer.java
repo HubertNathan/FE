@@ -5,6 +5,7 @@ import Units.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 public class BoardVisualizer extends JPanel{
     BufferedImage originalMap;
+    BufferedImage map;
     Map<Integer,BufferedImage> ColorSquaresMap;
     Map<Integer,BufferedImage> CursorMap;
     protected int tileAnimStep = 0;
@@ -28,6 +30,8 @@ public class BoardVisualizer extends JPanel{
     protected BufferedImage bufferImage;
     long lastTime;
     public BoardVisualizer(ReadMapFile mapReader, Board board, Selector selector) throws IOException {
+        ComponentListener ComponentH = new ComponentHandler();
+        this.addComponentListener(ComponentH);
         lastTime = System.nanoTime();
         load();
         this.board = board;
@@ -35,10 +39,9 @@ public class BoardVisualizer extends JPanel{
         width = mapReader.getDimensions()[1];
         this.mainFrame = new JFrame(mapReader.getChapter());
         mainFrame.setSize(new Dimension(tileSize* width,tileSize*height+37));
-        //originalMap = new BufferedImage(tileSize* width,tileSize*height, BufferedImage.TYPE_INT_ARGB);
-        //Graphics2D mapGraphics = originalMap.createGraphics();
-        //board.draw(mapGraphics);
-        bufferImage = (BufferedImage) createImage(tileSize* width,tileSize*height);
+        originalMap = new BufferedImage(tileSize* width,tileSize*height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D mapGraphics = originalMap.createGraphics();
+        board.draw(mapGraphics);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.add(this);
@@ -72,16 +75,15 @@ public class BoardVisualizer extends JPanel{
         float H = (float) (h-37)/(height);
         bufferImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics2D bufferImageGraphics = bufferImage.createGraphics();
-        //BufferedImage map = resizeImage(3 * (int) H*height,3 * (int) W * width, originalMap);
-        //bufferImageGraphics.drawImage(map,0,0,null);
+        bufferImageGraphics.drawImage(map,0,0,null);
         Graphics2D g2 = (Graphics2D) g;
         update();
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Unit unit = board.get(i,j).getUnit();
-                board.draw(bufferImageGraphics,i,j,W,H);
+                //board.draw(bufferImageGraphics,i,j,W,H);
                 if (board.get(i,j).isReachable()){board.draw(bufferImageGraphics,i,j,W,H, ColorSquaresMap.get(((tileAnimStep+2)/2)));}
-                if (unit != null){
+                /*if (unit != null){
                     if (unit.isOnCursor()) {
                         unit.draw(bufferImageGraphics, i, j, W, H, "select");
                     } else {
@@ -92,21 +94,19 @@ public class BoardVisualizer extends JPanel{
                 if (selector.getUnit() != null){
                     selector.draw(bufferImageGraphics,W,H,CursorMap.get(4));
                 } else selector.draw(bufferImageGraphics,W,H,CursorMap.get(cursorAnimState+1));
-            }
 
+                 */
+            }
         }
         g2.drawImage(bufferImage,0,0,null);
         g2.dispose();
     }
-    public BufferedImage resizeImage(int newH, int newW, BufferedImage texture) {
-        Image tmp = texture.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-        BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2d = dimg.createGraphics();
-        g2d.drawImage(tmp, 0, 0, null);
-        g2d.dispose();
-
-        return dimg;
+    public void resizeImage(int newH, int newW) {
+        Image tmp = originalMap.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+        map = new BufferedImage(newH,newW,BufferedImage.TYPE_INT_ARGB);
+        Graphics g = map.getGraphics();
+        g.drawImage(tmp,0,0,null);
+        g.dispose();
     }
 
     private void updateCursorAnimStep() {
@@ -145,7 +145,11 @@ public class BoardVisualizer extends JPanel{
             pv.repaint();
             Thread.sleep(500);
         }
-
-
+    }
+    public int getWidthValue() {
+        return width;
+    }
+    public int getHeightValue() {
+        return height;
     }
 }

@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 
-public class Board extends GameEngine{
+public class Board{
     int height = 0;
     int width = 0;
     private Square[][] board;

@@ -34,9 +34,7 @@ public class GameState  extends JPanel{
             c += 1;
             long lastTime = System.nanoTime();
             BV.repaint();
-            System.out.println("repaint");
             long fps = -s/(lastTime - System.nanoTime());
-            Thread.sleep(refreshPeriod);
             lastTime = System.nanoTime();
         }
     }
