@@ -42,6 +42,7 @@ public class BoardVisualizer extends JPanel{
         originalMap = new BufferedImage(tileSize* width,tileSize*height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D mapGraphics = originalMap.createGraphics();
         board.draw(mapGraphics);
+
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.add(this);
@@ -69,13 +70,11 @@ public class BoardVisualizer extends JPanel{
         lastTime = System.nanoTime();
         System.out.println("fps:"+fps);
         tileAnimStep=(tileAnimStep+1)%32;
+        Graphics2D bufferImageGraphics = bufferImage.createGraphics();
         updateCursorAnimStep();
         super.paintComponents(g);
         float W = (float) w/width;
         float H = (float) (h-37)/(height);
-        bufferImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D bufferImageGraphics = bufferImage.createGraphics();
-        bufferImageGraphics.drawImage(map,0,0,null);
         Graphics2D g2 = (Graphics2D) g;
         update();
         for (int i = 0; i < height; i++) {
@@ -103,8 +102,8 @@ public class BoardVisualizer extends JPanel{
     }
     public void resizeImage(int newH, int newW) {
         Image tmp = originalMap.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-        map = new BufferedImage(newH,newW,BufferedImage.TYPE_INT_ARGB);
-        Graphics g = map.getGraphics();
+        bufferImage = new BufferedImage(newH,newW,BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bufferImage.getGraphics();
         g.drawImage(tmp,0,0,null);
         g.dispose();
     }
