@@ -89,7 +89,7 @@ public abstract class Unit extends JPanel {
         }
         return availableMoves;
     }
-    public ArrayList<Square> findMoves (){return findMoves(new ArrayList<>(), Mov, x, y);}
+    public ArrayList<Square> findMoves (){return findMoves(new ArrayList<>(), Mov, y, x);}
     private void updateAvailableMov(ArrayList<Square> availableMoves, int mov, int i, int j) {
         Square square = board.get(i, j);
         int movPenalty = square.getTerrain().getMovPenalty(unitType);
@@ -103,14 +103,16 @@ public abstract class Unit extends JPanel {
             findMoves(availableMoves,remainingMov,i,j);
         }
     }
-    public ArrayList<Square> select(){
+    public Unit select(){
+        isSelected = true;
         ArrayList<Square> availableMoves = findMoves();
         for (Square square : availableMoves) {
             square.reach(true);
         }
-        return availableMoves;
+        return this;
     }
     public void unselect(){
+        isSelected = false;
         ArrayList<Square> availableMoves = findMoves();
         for (Square square : availableMoves) {
             square.reach(false);
@@ -148,5 +150,11 @@ public abstract class Unit extends JPanel {
     }
     public boolean isSelected(){
         return isSelected;
+    }
+
+    public void makeMove(int row, int col) {
+        this.unselect();
+        board.get(y,x).setUnit(null);
+        board.setUnit(this,row,col);
     }
 }

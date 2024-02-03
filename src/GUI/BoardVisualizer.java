@@ -102,6 +102,10 @@ public class BoardVisualizer extends JPanel{
         g2.drawImage(bufferImage,0,0,null);
         g2.dispose();
     }
+    public void repaintUnits() {
+
+    }
+
     public void resizeImage(int newH, int newW) {
         if (newH == 0 || newW == 0){return;}
         Image tmp = originalMap.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
@@ -129,13 +133,24 @@ public class BoardVisualizer extends JPanel{
             selector.moveCursor("left");
         } else if (KeyH.isRightPressed()) {
             selector.moveCursor("right");
-        } else if (KeyH.isEnterPressed() && selector.getUnit() != null){
-            selector.getUnit().select();
-        } else if (KeyH.isEscapePressed() && selector.getUnit().isSelected()) {
-            System.out.println("unselect");
-            selector.getUnit().unselect();
+        } else if (KeyH.isEnterPressed()){
+            enter();
+        } else if (KeyH.isEscapePressed() && selector.getSelectedUnit() != null) {
+            selector.getSelectedUnit().unselect();
         }
     }
+
+    private void enter() {
+        Unit selectedUnit = selector.getUnit();
+        if (selectedUnit != null) {
+            selector.selectUnit(selectedUnit);
+        } else if (selector.getSelectedUnit() != null && board.get(selector.getRow(),selector.getCol()).isReachable()) {
+            selector.getSelectedUnit().makeMove(selector.getRow(),selector.getCol());
+            selector.unSelectUnit();
+
+        }
+    }
+
     public static void main(String[] args) throws IOException, InterruptedException {
         ReadMapFile mapReader = new ReadMapFile("CH3.map");
         Board board = new Board(mapReader);

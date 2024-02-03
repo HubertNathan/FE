@@ -18,7 +18,7 @@ public class GameState  extends JPanel{
     Thread gameThread;
     public GameState() throws IOException, InterruptedException {
         long s = (long) 1000000000.0;
-        ReadMapFile mapReader = new ReadMapFile("CH1");
+        ReadMapFile mapReader = new ReadMapFile("CH2");
         Board board = new Board(mapReader);
         board.setUnit(new Lyn_Lord(),2,2,true);
         board.setUnit(new Cavalier("Sain"), 4, 4);
@@ -34,7 +34,7 @@ public class GameState  extends JPanel{
             long lastTime = System.nanoTime();
             BV.repaint();
             long fps = -s/(lastTime - System.nanoTime());
-            //Thread.sleep(refreshPeriod);
+            Thread.sleep(refreshPeriod);
             lastTime = System.nanoTime();
         }
     }

@@ -67,8 +67,17 @@ public class Square {
             case "Cliff":
                 this.terrain = new Cliff();
                 break;
+            case "Floor":
+                this.terrain = new Floor();
+                break;
             case "Forest":
                 this.terrain = new Forest();
+                break;
+            case "Fort":
+                this.terrain = new Fort();
+                break;
+            case "House":
+                this.terrain = new House();
                 break;
             case "Lake":
                 this.terrain = new Lake();

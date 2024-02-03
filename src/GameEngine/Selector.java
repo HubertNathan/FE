@@ -10,6 +10,7 @@ public class Selector {
     private int x;
     private int y;
     private Board board;
+    private Unit selectedUnit;
     public Selector(Unit leader, Board board){
         unit = leader;
 
@@ -69,5 +70,26 @@ public class Selector {
 
     public Unit getUnit() {
         return unit;
+    }
+    public void selectUnit(Unit unit){
+        if (selectedUnit != null){selectedUnit.unselect();}
+        selectedUnit = unit.select();
+    }
+
+    public void unSelectUnit() {
+        if (selectedUnit != null){
+            selectedUnit = null;
+        }
+    }
+
+    public Unit getSelectedUnit() {
+        return selectedUnit;
+    }
+
+    public int getRow() {
+        return y;
+    }
+    public int getCol(){
+        return x;
     }
 }

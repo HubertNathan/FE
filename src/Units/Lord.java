@@ -20,7 +20,7 @@ public class Lord extends Unit {
             put("Lck", 30);
             put("Def", 20);
             put("Res", 20);
-            put("Mov", 10);
+            put("Mov", 3);
             put("Con", 20);
         }});
         this.name = name;
@@ -57,7 +57,8 @@ public class Lord extends Unit {
             if (scaleX != (float) 16 && scaleY != (float) 16 && (int) scaleX != 0 && (int) scaleY != 0) {
                 sprite = resizeImage((int) (scaleY) * 2, (int) (scaleX) * 2, mode);
             }
-            g.drawImage(sprite, (int) (scaleX) * j - (int) (scaleX)/2, (int) (scaleY) * i - (int) (scaleY) +(int) (scaleY)/16, null);
+            g.drawImage(sprite, (int) (scaleX) * j - (int) (scaleX)/2, (int) (scaleY) * (i - 1) +(int) (scaleY)/16, null);
+            animation();
             animation();
         }
     }
