@@ -5,6 +5,7 @@ import GameEngine.Square;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Map;
@@ -21,20 +22,21 @@ public abstract class Unit extends JPanel {
     protected int Res;
     protected int Mov;
     protected int Con;
-    protected int animState;
-    protected int animStep;
     protected String name;
     protected String unitType;
     protected BufferedImage standingSprites;
     protected BufferedImage selectSprites;
+    protected BufferedImage resizedStandingSprites;
+    protected BufferedImage resizedSelectSprites;
     protected int x;
     protected int y;
     private Board board;
     protected boolean isLeader = false;
     protected boolean isOnCursor = false;
     protected boolean isSelected = false;
+    protected String mode = "standing";
 
-    Unit(String name, Map<String, Integer> stats) {
+    Unit(String name, Map<String, Integer> stats) throws IOException {
         this.board = board;
         LVL = stats.get("LVL");
         HP = stats.get("HP");
@@ -48,31 +50,43 @@ public abstract class Unit extends JPanel {
         Mov = stats.get("Mov");
         Con = stats.get("Con");
         this.name = name;
-        animState = 0;
-        animStep = 0;
+        load();
+        resizedStandingSprites = standingSprites;
+        resizedSelectSprites = selectSprites;
+        resizeSprites(96, 96);
     }
-    public BufferedImage resizeImage(int newH, int newW,String mode) {
-        Image tmp = getSprite(mode).getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-        BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2d = dimg.createGraphics();
-        g2d.drawImage(tmp, 0, 0, null);
-        g2d.dispose();
-
-        return dimg;
-    }
-    public abstract BufferedImage getSprite(String mode);
-
-    public abstract void draw(Graphics2D g,int i, int j,float scaleX, float scaleY, String mode);
-
-    public void animation() {
-        animStep = (animStep+1)%36;
-        if (animStep == 1|| animStep ==3) {
-            animState = (animState + 1);
-        } else if (animStep == 19 || animStep == 21 ) {
-            animState = (animState - 1);
+    public void draw(Graphics2D g, int i, int j, int scaleX, int scaleY, int animFrame) {
+        if(scaleX<=0 || scaleY<=0){return;}
+        if (mode.equals("standing")) {
+            int animStep = animation(animFrame);;
+            BufferedImage sprite = resizedStandingSprites.getSubimage(0, animStep * 2*(int) scaleY, (int)scaleX, 2*(int) scaleY);
+            g.drawImage(sprite, (int) (scaleX) * j, (int) (scaleY) * (i-1), null);
+        }
+        else if (mode.equals("select")) {
+            int animStep = animation((2*animFrame)%36);
+            BufferedImage sprite = resizedSelectSprites.getSubimage(0, (12 + animStep) *2* (int)scaleY, 2*(int)scaleX, 2*(int)scaleY);
+            g.drawImage(sprite, (int) (scaleX) * j - (int) (scaleX)/2, (int) (scaleY) * (i - 1), null);
         }
     }
+
+    public void resizeSprites(int newW, int  newH) {
+        if(newW<=0 || newH<=0){return;}
+        Image tmp1 = standingSprites.getScaledInstance(newW, 3*2*newH, Image.SCALE_SMOOTH);
+        resizedStandingSprites= new BufferedImage(newW, 3*2*newH, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = resizedStandingSprites.createGraphics();
+        g2d.drawImage(tmp1, 0, 0, null);
+        g2d.dispose();
+        Image tmp2 = selectSprites.getScaledInstance(2*newW, 15*2*newH, Image.SCALE_SMOOTH);
+        resizedSelectSprites= new BufferedImage(2*newW, 15*2*newH, BufferedImage.TYPE_INT_ARGB);
+        g2d = resizedSelectSprites.createGraphics();
+        g2d.drawImage(tmp2, 0, 0, null);
+        g2d.dispose();
+    }
+    public abstract void load() throws IOException;
+    public int animation(int animFrame) {
+        return ((animFrame > 0) ? 1 : 0) + ((animFrame > 2) ? 1 : 0) - ((animFrame > 18) ? 1 : 0) - ((animFrame > 20) ? 1 : 0);
+    }
+
     public ArrayList<Square> findMoves (ArrayList<Square> availableMoves, int mov, int i, int j){
         if (i+1< board.getHeight()) {
             updateAvailableMov(availableMoves, mov, i + 1, j);
@@ -104,6 +118,7 @@ public abstract class Unit extends JPanel {
         }
     }
     public Unit select(){
+        mode = "select";
         isSelected = true;
         ArrayList<Square> availableMoves = findMoves();
         for (Square square : availableMoves) {
@@ -112,6 +127,7 @@ public abstract class Unit extends JPanel {
         return this;
     }
     public void unselect(){
+        mode = "standing";
         isSelected = false;
         ArrayList<Square> availableMoves = findMoves();
         for (Square square : availableMoves) {
@@ -142,19 +158,22 @@ public abstract class Unit extends JPanel {
     public boolean isLeader(){
         return isLeader;
     }
-    public boolean isOnCursor(){
-        return isOnCursor;
-    }
-    public void setCursored(boolean b){
-        isOnCursor = b;
-    }
-    public boolean isSelected(){
-        return isSelected;
+    public void setMode(String mode){
+        this.mode = mode;
     }
 
     public void makeMove(int row, int col) {
         this.unselect();
-        board.get(y,x).setUnit(null);
+        board.removeUnit(this,y,x);
         board.setUnit(this,row,col);
+    }
+    @Override
+    public String toString() {
+        return name;
+    }
+
+
+    public static void main(String[] args) {
+
     }
 }

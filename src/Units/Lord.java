@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Lord extends Unit {
-    Lord(String name) {
+    Lord(String name) throws IOException {
         super(name, new HashMap<String, Integer>() {{
             put("LVL", 1);
             put("HP", 60);
@@ -29,37 +29,5 @@ public class Lord extends Unit {
 
     public void load() throws IOException {
         standingSprites = ImageIO.read(new File("/Sprites/Lord/standingSprites"));
-    }
-
-    public BufferedImage getSprite(String mode) {
-        if (mode.equals("standing")) {
-            return standingSprites.getSubimage(0, animState * 16, 16, 16);
-        }
-        if (mode.equals("select")) {
-            return selectSprites.getSubimage(0, (12 + animState) * 32, 32, 32);
-        }
-        return standingSprites.getSubimage(0, 16, 16, 16);
-    }
-
-
-
-    public void draw(Graphics2D g, int i, int j, float scaleX, float scaleY, String mode) {
-        if (mode.equals("standing")) {
-            BufferedImage sprite = getSprite(mode);
-            if (scaleX != (float) 16 && scaleY != (float) 16 && (int) scaleX != 0 && (int) scaleY != 0) {
-                sprite = resizeImage((int) (scaleY), (int) (scaleX), mode);
-            }
-            g.drawImage(sprite, (int) (scaleX) * j, (int) (scaleY) * i, null);
-            animation();
-        }
-        else if (mode.equals("select")){
-            BufferedImage sprite = getSprite(mode);
-            if (scaleX != (float) 16 && scaleY != (float) 16 && (int) scaleX != 0 && (int) scaleY != 0) {
-                sprite = resizeImage((int) (scaleY) * 2, (int) (scaleX) * 2, mode);
-            }
-            g.drawImage(sprite, (int) (scaleX) * j - (int) (scaleX)/2, (int) (scaleY) * (i - 1) +(int) (scaleY)/16, null);
-            animation();
-            animation();
-        }
     }
 }

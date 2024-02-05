@@ -44,10 +44,10 @@ public class Square {
             put(30, "Wall_Weak");
         }};
     BufferedImage originalTexture;
-    BufferedImage texture;
-    Terrain terrain = new VoidTile();
-    Unit unit = null;
-    boolean isReachable = false;
+    private BufferedImage texture;
+    private Terrain terrain = new VoidTile();
+    private Unit unit = null;
+    private boolean isReachable = false;
     public Square(){
 
     }

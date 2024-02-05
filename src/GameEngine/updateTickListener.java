@@ -12,6 +12,7 @@ public class updateTickListener implements ActionListener {
     }
     @Override
     public void actionPerformed(ActionEvent e) {
+        boardVisualizer.animate();
 
     }
 }

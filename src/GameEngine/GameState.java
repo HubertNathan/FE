@@ -16,6 +16,7 @@ public class GameState  extends JPanel{
     int c = 0;
     KeyHandler KeyH;
     Thread gameThread;
+    Timer tickTimer;
     public GameState() throws IOException, InterruptedException {
         long s = (long) 1000000000.0;
         ReadMapFile mapReader = new ReadMapFile("CH2");
@@ -25,22 +26,23 @@ public class GameState  extends JPanel{
         board.setUnit(new Brigand("Brigand"),6,6);
         Unit leader = board.getLeader();
         Selector selector = new Selector(leader, board);
-        BoardVisualizer BV = new BoardVisualizer(mapReader, board,selector);
+        BoardVisualizer BV = new BoardVisualizer(mapReader, board,selector,this);
+        tickTimer = new Timer((int)refreshPeriod,new updateTickListener(BV));
+        tickTimer.start();
+        BV.repaint();
+        Thread.sleep(1000);
         startGameThread();
-
-
-        while (true) {
-            c += 1;
-            long lastTime = System.nanoTime();
-            BV.repaint();
-            long fps = -s/(lastTime - System.nanoTime());
-            Thread.sleep(refreshPeriod);
-            lastTime = System.nanoTime();
-        }
     }
     public void startGameThread(){
         gameThread = new Thread(String.valueOf(this));
         gameThread.start();
 
+    }
+    public void pauseTimer(){
+        tickTimer.stop();
+
+    }
+    public void resumeTimer(){
+        tickTimer.restart();
     }
 }

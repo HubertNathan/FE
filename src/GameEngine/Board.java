@@ -3,20 +3,29 @@ package GameEngine;
 import GUI.ReadMapFile;
 import Units.Unit;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 public class Board{
     int height = 0;
     int width = 0;
     private Square[][] board;
-    private KeyHandler KeyH;
-    public Board(ReadMapFile mapReader) throws FileNotFoundException {
+    private ArrayList<Unit> units;
+    private HashMap<Integer, BufferedImage> ColorSquaresMap;
+    public Board(ReadMapFile mapReader) throws IOException {
         int[] dimensions = mapReader.getDimensions();
         height = dimensions[0];
         width = dimensions[1];
         board = new Square[height][width];
+        units = new ArrayList<>(Collections.nCopies(board.length * board[0].length, null));
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 String terrain = mapReader.getMap().get(width*i+j);
@@ -25,7 +34,10 @@ public class Board{
                 board[i][j].setTerrainType(terrainType);
             }
         }
-
+        ColorSquaresMap = new HashMap<>();
+        for (int i = 1; i < 17; i++) {
+            ColorSquaresMap.put(i, ImageIO.read(new File("src/GUI/ColorSquares/"+i+".png")));
+        }
     }
     public Square get(int i, int j){
         return board[i][j];
@@ -38,21 +50,20 @@ public class Board{
         return width;
     }
     public void setUnit(Unit unit,int i, int j){
+        units.add(j+board.length * i,unit);
         board[i][j].setUnit(unit);
         unit.setBoard(this);
-        System.out.println(j);
         unit.setX(j);
         unit.setY(i);
+        System.out.println("coucou");
     }
     public void setUnit(Unit unit,int i, int j, boolean isLeader){
         unit.setLeader(isLeader);
         setUnit(unit,i,j);
     }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        int[][] types = {{0,1},{0,0}};
-        Board b = new Board(new ReadMapFile());
-
+    public void removeUnit(Unit unit, int i, int j){
+        units.remove(unit);
+        board[i][j].setUnit(null);
     }
     public Unit getLeader(){
         for (int i = 0; i < height; i++) {
@@ -67,35 +78,24 @@ public class Board{
         }
         return null;
     }
-    public void draw(Graphics2D g2, int i, int j, float scaleX, float scaleY, BufferedImage texture) {
-        if ((int) scaleX != 0 && (int) scaleY != 0) {
-            texture = resizeImage((int) (scaleY), (int) (scaleX), texture);
-        }
-        g2.drawImage(texture, (int) scaleX * j, (int) scaleY * i+(int)scaleY/16,(int) scaleX - (int) scaleX/16,(int) scaleY - (int) scaleY/16, null);
+    public ArrayList<Unit> getUnits(){
+        return units;
     }
-    public BufferedImage resizeImage(int newH, int newW, BufferedImage texture) {
-        Image tmp = texture.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-        BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2d = dimg.createGraphics();
-        g2d.drawImage(tmp, 0, 0, null);
-        g2d.dispose();
-
-        return dimg;
+    public void draw(Graphics2D g2, int i, int j,int scaleX,int scaleY, BufferedImage texture) {
+        g2.drawImage(texture, (int) scaleX * j, (int) scaleY * i,(int) scaleX,(int) scaleY, null);
     }
-    public void draw(Graphics2D g2, int i, int j, float scaleX, float scaleY) {
+    public void draw(Graphics2D g2, int i, int j,int scaleX,int scaleY) {
         BufferedImage texture = board[i][j].getOriginalTexture();
-        if ((int) scaleX != 0 && (int) scaleY != 0) {
-            texture = resizeImage((int) (scaleY), (int) (scaleX), texture);
-        }
-        g2.drawImage(texture, (int) scaleX * j, (int) scaleY * i, null);
+        draw(g2, i, j,scaleX,scaleY, texture);
     }
     public void draw(Graphics2D g2){
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 g2.drawImage(board[i][j].getOriginalTexture(),16 * j,16 * i,null);
             }
-
         }
+    }
+    public void drawColoredSquares(Graphics2D g2, int i, int j, int scaleX, int scaleY, int animFrame,boolean drawBlueSquares){
+        if (drawBlueSquares) {g2.drawImage(ColorSquaresMap.get(1+animFrame%16), j, i, scaleX,scaleY,null);}
     }
 }

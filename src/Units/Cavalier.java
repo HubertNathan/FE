@@ -25,38 +25,6 @@ public class Cavalier extends Unit {
         unitType = "KnightsA";
         load();
     }
-
-    @Override
-    public BufferedImage getSprite(String mode) {
-        if (mode.equals("standing")) {
-            return standingSprites.getSubimage(0, animState * 32, 16, 32);
-        }
-        else if (mode.equals("select")){
-            return selectSprites.getSubimage(0, (12 + animState) * 32, 32, 32);
-        }
-        return standingSprites.getSubimage(0,16,16,16);
-    }
-
-    @Override
-    public void draw(Graphics2D g, int i, int j, float scaleX, float scaleY, String mode) {
-        if (mode.equals("standing")) {
-            BufferedImage sprite = getSprite(mode);
-            if (scaleX != (float) 16 && scaleY != (float) 16 && (int) scaleX != 0 && (int) scaleY != 0) {
-                sprite = resizeImage((int) (2 * scaleY), (int) (scaleX), mode);
-            }
-            g.drawImage(sprite, (int) (scaleX) * j, (int) (scaleY) * (i - 1), null);
-            animation();
-        }
-        else if (mode.equals("select")) {
-            BufferedImage sprite = getSprite(mode);
-            if (scaleX != (float) 16 && scaleY != (float) 16 && (int) scaleX != 0 && (int) scaleY != 0) {
-                sprite = resizeImage((int) (scaleY) * 2, (int) (scaleX) * 2, mode);
-            }
-            g.drawImage(sprite, (int) (scaleX) * j - (int) (scaleX)/2, (int) (scaleY) * (i - 1) +(int) (scaleY)/16, null);
-            animation();
-            animation();
-        }
-    }
     public void load() throws IOException {
         standingSprites = ImageIO.read(new File("Sprites/Cavalier/standingSprites.png"));
         selectSprites = ImageIO.read(new File("Sprites/Cavalier/movingSprites.png"));
