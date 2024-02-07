@@ -30,4 +30,7 @@ public class Brigand extends Unit{
         standingSprites = ImageIO.read(new File("Sprites/Brigand/standingSprites.png"));
         selectSprites = ImageIO.read(new File("Sprites/Brigand/movingSprites.png"));
     }
+    public Unit copy() throws IOException {
+        return new Brigand(name);
+    }
 }

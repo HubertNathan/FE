@@ -19,7 +19,7 @@ public class GameState  extends JPanel{
     Timer tickTimer;
     public GameState() throws IOException, InterruptedException {
         long s = (long) 1000000000.0;
-        ReadMapFile mapReader = new ReadMapFile("CH2");
+        ReadMapFile mapReader = new ReadMapFile("CH1");
         Board board = new Board(mapReader);
         board.setUnit(new Lyn_Lord(),2,2,true);
         board.setUnit(new Cavalier("Sain"), 4, 4);

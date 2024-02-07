@@ -35,9 +35,7 @@ public class Lyn_Lord extends Lord{
             g.drawImage(sprite, (int) (scaleX) * j, (int) (scaleY) * (i)-(int)(scaleY)/16, null);
         }
         else if (mode.equals("select")) {
-            int animStep = animation((2*animFrame)%36);
-            BufferedImage sprite = resizedSelectSprites.getSubimage(0, (12 + animStep) *2* (int)scaleY, 2*(int)scaleX, 2*(int)scaleY);
-            g.drawImage(sprite, (int) (scaleX) * j - (int) (scaleX)/2, (int) (scaleY) * (i - 1), null);
+            super.draw(g,i,j,scaleX,scaleY,animFrame);
         }
     }
     public void resizeSprites(int newW, int  newH) {
@@ -52,6 +50,9 @@ public class Lyn_Lord extends Lord{
         g2d = resizedSelectSprites.createGraphics();
         g2d.drawImage(tmp2, 0, 0, null);
         g2d.dispose();
+    }
+    public Unit copy() throws IOException {
+        return new Lyn_Lord();
     }
 }
 

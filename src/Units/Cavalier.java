@@ -29,4 +29,7 @@ public class Cavalier extends Unit {
         standingSprites = ImageIO.read(new File("Sprites/Cavalier/standingSprites.png"));
         selectSprites = ImageIO.read(new File("Sprites/Cavalier/movingSprites.png"));
     }
+    public Unit copy() throws IOException {
+        return new Cavalier(name);
+    }
 }

@@ -6,6 +6,7 @@ import GUI.BoardVisualizer;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.io.IOException;
 
 public class ComponentHandler implements ComponentListener{
     GameState gs;
@@ -26,7 +27,13 @@ public class ComponentHandler implements ComponentListener{
              int scaleX = ((BoardVisualizer) c).getWidth()/ ((BoardVisualizer) c).getWidthValue();
              int scaleY = ((BoardVisualizer) c).getHeight()/ ((BoardVisualizer) c).getHeightValue();
              System.out.println(scaleX+" "+scaleY);
-             ((BoardVisualizer) c).resizeImages(scaleY,scaleX);
+             try {
+                 ((BoardVisualizer) c).resizeImages(scaleY,scaleX);
+             } catch (InterruptedException ex) {
+                 throw new RuntimeException(ex);
+             } catch (IOException ex) {
+                 throw new RuntimeException(ex);
+             }
              c.repaint();
          }
          gs.resumeTimer();

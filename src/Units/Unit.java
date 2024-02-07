@@ -1,14 +1,15 @@
 package Units;
 
+import GUI.ReadMapFile;
 import GameEngine.Board;
+import GameEngine.Node;
 import GameEngine.Square;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Unit extends JPanel {
     protected int LVL;
@@ -35,6 +36,7 @@ public abstract class Unit extends JPanel {
     protected boolean isOnCursor = false;
     protected boolean isSelected = false;
     protected String mode = "standing";
+    protected ArrayList<Square> availableMoves;
 
     Unit(String name, Map<String, Integer> stats) throws IOException {
         this.board = board;
@@ -103,7 +105,9 @@ public abstract class Unit extends JPanel {
         }
         return availableMoves;
     }
-    public ArrayList<Square> findMoves (){return findMoves(new ArrayList<>(), Mov, y, x);}
+    public void findMoves (){
+        availableMoves = findMoves(new ArrayList<>(), Mov, y, x);
+    }
     private void updateAvailableMov(ArrayList<Square> availableMoves, int mov, int i, int j) {
         Square square = board.get(i, j);
         int movPenalty = square.getTerrain().getMovPenalty(unitType);
@@ -111,7 +115,7 @@ public abstract class Unit extends JPanel {
             return;
         }
         int remainingMov = mov -movPenalty;
-        if( remainingMov >= 0 && !availableMoves.contains(square) && (square.getUnit() == null || (x==j&&y==i))){
+        if( remainingMov >= 0 && !availableMoves.contains(square)){
             availableMoves.add(square);
         } if (remainingMov > 0) {
             findMoves(availableMoves,remainingMov,i,j);
@@ -120,16 +124,15 @@ public abstract class Unit extends JPanel {
     public Unit select(){
         mode = "select";
         isSelected = true;
-        ArrayList<Square> availableMoves = findMoves();
+        findMoves();
         for (Square square : availableMoves) {
-            square.reach(true);
+            if (square.getUnit() == null || (square.getUnit().getXValue()==x &&square.getUnit().getYValue() == y)) square.reach(true);
         }
         return this;
     }
     public void unselect(){
         mode = "standing";
         isSelected = false;
-        ArrayList<Square> availableMoves = findMoves();
         for (Square square : availableMoves) {
             square.reach(false);
         }
@@ -162,18 +165,93 @@ public abstract class Unit extends JPanel {
         this.mode = mode;
     }
 
-    public void makeMove(int row, int col) {
-        this.unselect();
-        board.removeUnit(this,y,x);
-        board.setUnit(this,row,col);
+    public void makeMove(int row, int col) throws InterruptedException {
+            board.removeUnit(this,y,x);
+            board.setUnit(this,row,col);
     }
+    public ArrayList<Square> getAvailableMoves(){return availableMoves;}
+
+    public abstract Unit copy() throws IOException;
     @Override
     public String toString() {
         return name;
     }
+    public ArrayList<Integer> BFS_Algorithm(int end){
+        int start = y* board.getWidth()+x;
+        Queue<Node> queue = new LinkedList<>();
+        boolean[] nodes = new boolean[board.getHeight()*board.getWidth()];
+        queue.add(new Node(board,start/board.getWidth(), start%board.getWidth()));
+        nodes[start] = true;
+        Node n = new Node(board,board.getHeight(),board.getWidth());
+        Node node = new Node(board,board.getHeight(),board.getWidth());
+        while (!queue.isEmpty()){
+            n = queue.poll();
+            int i = n.getRow();
+            int j = n.getCol();
+            if (i>0){
+                if (board.get(i-1,j).getTerrain().getMovPenalty(unitType)>=0 && !nodes[(i-1)* board.getWidth()+j] && availableMoves.contains(board.get(i-1,j))){
+                    nodes[(i-1)* board.getWidth()+j] = true;
+                    node = new Node(board,i-1,j);
+                    node.setParent(n);
+                    queue.add(node);
+                }
+            }
+            if (j>0){
+                if (board.get(i,j-1).getTerrain().getMovPenalty(unitType)>=0 && !nodes[i* board.getWidth()+j-1] && availableMoves.contains(board.get(i,j-1))){
+                    nodes[i* board.getWidth()+j] = true;
+                    node = new Node(board,i,j-1);
+                    node.setParent(n);
+                    queue.add(node);
+                }
+            }
+            if (i+1<board.getHeight()){
+                if (board.get(i+1,j).getTerrain().getMovPenalty(unitType)>=0 && !nodes[(i+1)* board.getWidth()+j] && availableMoves.contains(board.get(i+1,j))){
+                    nodes[(i+1)* board.getWidth()+j] = true;
+                    node = new Node(board,i+1,j);
+                    node.setParent(n);
+                    queue.add(node);
+                }
+            }
+            if (j+1<board.getWidth()){
+                if (board.get(i,j+1).getTerrain().getMovPenalty(unitType)>=0 && !nodes[i* board.getWidth()+j+1] && availableMoves.contains(board.get(i,j+1))){
+                    nodes[i* board.getWidth()+j+1] = true;
+                    node = new Node(board,i,j+1);
+                    node.setParent(n);
+                    queue.add(node);
+                }
+            }
+            if (n.getRow()*board.getWidth()+ n.getCol() == end) {
+                break;
+            }
+        }
+        ArrayList<Integer> path = new ArrayList<>();
+        while (n.getParent() != null){
+            path.add(n.getSquareIndex());
+            n = n.getParent();
+        }
+        return path;
 
+    }
+    public ArrayList<Square> dijkstraAlgorithm(int start, int end) {
+        boolean finished = false;
+        ArrayList<Boolean> visitedNodes = new ArrayList<>(Collections.nCopies(board.getHeight()*board.getWidth(),false));
+        ArrayList<Integer> backTrackList = new ArrayList<>(Collections.nCopies(board.getHeight()*board.getWidth(),0));
+        int x = start% board.getWidth();
+        int y = start % board.getHeight();
+        while (!finished){
+            if (x + 1 < board.getWidth()){
 
-    public static void main(String[] args) {
+            }
+        }
+    return null;
+    }
 
+    public static void main(String[] args) throws IOException {
+        ReadMapFile map = new ReadMapFile("CH1");
+        Board b = new Board(map);
+        Unit lyn = new Lyn_Lord();
+        b.setUnit(lyn,2,2);
+        lyn.findMoves();
+        ArrayList<Integer> path = lyn.BFS_Algorithm(0* b.getWidth()+1);
     }
 }

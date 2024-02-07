@@ -30,4 +30,7 @@ public class Lord extends Unit {
     public void load() throws IOException {
         standingSprites = ImageIO.read(new File("/Sprites/Lord/standingSprites"));
     }
+    public Unit copy() throws IOException {
+        return new Lord(name);
+    }
 }

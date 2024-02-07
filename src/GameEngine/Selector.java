@@ -97,7 +97,6 @@ public class Selector {
     public void selectUnit(Unit unit){
         if (selectedUnit != null){selectedUnit.unselect();}
         selectedUnit = unit.select();
-
     }
 
     public void unSelectUnit() {
@@ -115,5 +114,9 @@ public class Selector {
     }
     public int getCol(){
         return x;
+    }
+
+    public Square getSquare(){
+        return board.get(y,x);
     }
 }

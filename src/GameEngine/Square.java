@@ -48,12 +48,6 @@ public class Square {
     private Terrain terrain = new VoidTile();
     private Unit unit = null;
     private boolean isReachable = false;
-    public Square(){
-
-    }
-    public void drawReachableTile(Graphics2D g2, int i, int j, float scaleX, float scaleY){
-
-    }
 
     public Square(BufferedImage image){
         this.originalTexture = image;

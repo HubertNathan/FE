@@ -19,7 +19,8 @@ public class Board{
     int width = 0;
     private Square[][] board;
     private ArrayList<Unit> units;
-    private HashMap<Integer, BufferedImage> ColorSquaresMap;
+    private HashMap<Integer, BufferedImage> ColorSquareMap;
+    private HashMap<Integer, BufferedImage> OriginalSquareMap;
     public Board(ReadMapFile mapReader) throws IOException {
         int[] dimensions = mapReader.getDimensions();
         height = dimensions[0];
@@ -34,10 +35,13 @@ public class Board{
                 board[i][j].setTerrainType(terrainType);
             }
         }
-        ColorSquaresMap = new HashMap<>();
+        OriginalSquareMap = new HashMap<>();
+        ColorSquareMap = new HashMap<>();
         for (int i = 1; i < 17; i++) {
-            ColorSquaresMap.put(i, ImageIO.read(new File("src/GUI/ColorSquares/"+i+".png")));
+            OriginalSquareMap.put(i, ImageIO.read(new File("src/GUI/ColorSquares/"+i+".png")));
+            ColorSquareMap.put(i, ImageIO.read(new File("src/GUI/ColorSquares/"+i+".png")));
         }
+            resizeColouredSquares(48,48);
     }
     public Square get(int i, int j){
         return board[i][j];
@@ -55,7 +59,6 @@ public class Board{
         unit.setBoard(this);
         unit.setX(j);
         unit.setY(i);
-        System.out.println("coucou");
     }
     public void setUnit(Unit unit,int i, int j, boolean isLeader){
         unit.setLeader(isLeader);
@@ -85,8 +88,7 @@ public class Board{
         g2.drawImage(texture, (int) scaleX * j, (int) scaleY * i,(int) scaleX,(int) scaleY, null);
     }
     public void draw(Graphics2D g2, int i, int j,int scaleX,int scaleY) {
-        BufferedImage texture = board[i][j].getOriginalTexture();
-        draw(g2, i, j,scaleX,scaleY, texture);
+        draw(g2,i,j,scaleX,scaleY,!board[i][j].isReachable());
     }
     public void draw(Graphics2D g2){
         for (int i = 0; i < height; i++) {
@@ -95,7 +97,31 @@ public class Board{
             }
         }
     }
-    public void drawColoredSquares(Graphics2D g2, int i, int j, int scaleX, int scaleY, int animFrame,boolean drawBlueSquares){
-        if (drawBlueSquares) {g2.drawImage(ColorSquaresMap.get(1+animFrame%16), j, i, scaleX,scaleY,null);}
+    public void draw(Graphics2D g2, int i, int j,int scaleX,int scaleY,boolean forceRedraw) {
+        if (forceRedraw) {
+            BufferedImage texture = board[i][j].getOriginalTexture();
+            draw(g2, i, j, scaleX, scaleY, texture);
+        }
+    }
+    public void drawColouredSquares(Graphics2D g2, int scaleX, int scaleY, int animFrame,boolean drawBlueSquares){
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                if (board[i][j].isReachable()) {
+                    draw(g2,i,j,scaleX,scaleY);
+                    g2.drawImage(ColorSquareMap.get(1+animFrame%16), scaleX*j,scaleY*i,null);
+                }
+            }
+        }
+    }
+    public void resizeColouredSquares(int newW, int newH){
+        for (int i:OriginalSquareMap.keySet()){
+            if(newW<=0 || newH<=0){return;}
+            Image tmp = OriginalSquareMap.get(i).getScaledInstance(newW-newW/16, newH-newH/16, Image.SCALE_SMOOTH);
+            BufferedImage resizedSprite= new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = resizedSprite.createGraphics();
+            g2d.drawImage(tmp, newW/16, newH/16, null);
+            g2d.dispose();
+            ColorSquareMap.replace(i,resizedSprite);
+        }
     }
 }
