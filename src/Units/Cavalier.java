@@ -1,5 +1,7 @@
 package Units;
 
+import GUI.ResizableImage;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -26,8 +28,8 @@ public class Cavalier extends Unit {
         load();
     }
     public void load() throws IOException {
-        standingSprites = ImageIO.read(new File("Sprites/Cavalier/standingSprites.png"));
-        selectSprites = ImageIO.read(new File("Sprites/Cavalier/movingSprites.png"));
+        standingSprites = new ResizableImage("file:Sprites/Cavalier/standingSprites.png");
+        selectSprites = new ResizableImage("file:Sprites/Cavalier/movingSprites.png");
     }
     public Unit copy() throws IOException {
         return new Cavalier(name);

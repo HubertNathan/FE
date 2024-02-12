@@ -26,7 +26,6 @@ public class ComponentHandler implements ComponentListener{
          if (c instanceof BoardVisualizer){
              int scaleX = ((BoardVisualizer) c).getWidth()/ ((BoardVisualizer) c).getWidthValue();
              int scaleY = ((BoardVisualizer) c).getHeight()/ ((BoardVisualizer) c).getHeightValue();
-             System.out.println(scaleX+" "+scaleY);
              try {
                  ((BoardVisualizer) c).resizeImages(scaleY,scaleX);
              } catch (InterruptedException ex) {

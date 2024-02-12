@@ -1,17 +1,18 @@
 package Units;
 
 import GUI.ReadMapFile;
+import GUI.ResizableImage;
 import GameEngine.Board;
 import GameEngine.Node;
 import GameEngine.Square;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Pane;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
+
 import java.io.IOException;
 import java.util.*;
 
-public abstract class Unit extends JPanel {
+public abstract class Unit extends Pane {
     protected int LVL;
     protected int HP;
     protected int Str;
@@ -25,10 +26,8 @@ public abstract class Unit extends JPanel {
     protected int Con;
     protected String name;
     protected String unitType;
-    protected BufferedImage standingSprites;
-    protected BufferedImage selectSprites;
-    protected BufferedImage resizedStandingSprites;
-    protected BufferedImage resizedSelectSprites;
+    protected ResizableImage standingSprites;
+    protected ResizableImage selectSprites;
     protected int x;
     protected int y;
     private Board board;
@@ -39,7 +38,6 @@ public abstract class Unit extends JPanel {
     protected ArrayList<Square> availableMoves;
 
     Unit(String name, Map<String, Integer> stats) throws IOException {
-        this.board = board;
         LVL = stats.get("LVL");
         HP = stats.get("HP");
         Str = stats.get("Str");
@@ -53,40 +51,23 @@ public abstract class Unit extends JPanel {
         Con = stats.get("Con");
         this.name = name;
         load();
-        resizedStandingSprites = standingSprites;
-        resizedSelectSprites = selectSprites;
-        resizeSprites(96, 96);
-    }
-    public void draw(Graphics2D g, int i, int j, int scaleX, int scaleY, int animFrame) {
-        if(scaleX<=0 || scaleY<=0){return;}
-        if (mode.equals("standing")) {
-            int animStep = animation(animFrame);;
-            BufferedImage sprite = resizedStandingSprites.getSubimage(0, animStep * 2*(int) scaleY, (int)scaleX, 2*(int) scaleY);
-            g.drawImage(sprite, (int) (scaleX) * j, (int) (scaleY) * (i-1), null);
-        }
-        else if (mode.equals("select")) {
-            int animStep = animation((2*animFrame)%36);
-            BufferedImage sprite = resizedSelectSprites.getSubimage(0, (12 + animStep) *2* (int)scaleY, 2*(int)scaleX, 2*(int)scaleY);
-            g.drawImage(sprite, (int) (scaleX) * j - (int) (scaleX)/2, (int) (scaleY) * (i - 1), null);
-        }
-    }
-
-    public void resizeSprites(int newW, int  newH) {
-        if(newW<=0 || newH<=0){return;}
-        Image tmp1 = standingSprites.getScaledInstance(newW, 3*2*newH, Image.SCALE_SMOOTH);
-        resizedStandingSprites= new BufferedImage(newW, 3*2*newH, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = resizedStandingSprites.createGraphics();
-        g2d.drawImage(tmp1, 0, 0, null);
-        g2d.dispose();
-        Image tmp2 = selectSprites.getScaledInstance(2*newW, 15*2*newH, Image.SCALE_SMOOTH);
-        resizedSelectSprites= new BufferedImage(2*newW, 15*2*newH, BufferedImage.TYPE_INT_ARGB);
-        g2d = resizedSelectSprites.createGraphics();
-        g2d.drawImage(tmp2, 0, 0, null);
-        g2d.dispose();
+        //resizeSprites(96, 96);
     }
     public abstract void load() throws IOException;
-    public int animation(int animFrame) {
-        return ((animFrame > 0) ? 1 : 0) + ((animFrame > 2) ? 1 : 0) - ((animFrame > 18) ? 1 : 0) - ((animFrame > 20) ? 1 : 0);
+
+    public Image getSprites(){
+        return mode.equals("standing")?standingSprites:selectSprites;
+    }
+
+    public double getSpriteSize(){
+        return getSprites().getWidth();
+    }
+    public int getSpriteNumber(){
+        return (int)(getSprites().getHeight()/getSpriteSize());
+    }
+    public int animation(int animFrame, boolean moving) {
+        if (!moving) return ((animFrame > 0) ? 1 : 0) + ((animFrame > 2) ? 1 : 0) - ((animFrame > 18) ? 1 : 0) - ((animFrame > 20) ? 1 : 0);
+        else return ((animFrame > 9) ? 1 : 0) + ((animFrame > 18) ? 1 : 0) + ((animFrame > 27) ? 1 : 0);
     }
 
     public ArrayList<Square> findMoves (ArrayList<Square> availableMoves, int mov, int i, int j){
@@ -122,7 +103,7 @@ public abstract class Unit extends JPanel {
         }
     }
     public Unit select(){
-        mode = "select";
+        mode = "moving";
         isSelected = true;
         findMoves();
         for (Square square : availableMoves) {
@@ -130,9 +111,11 @@ public abstract class Unit extends JPanel {
         }
         return this;
     }
-    public void unselect(){
-        mode = "standing";
-        isSelected = false;
+    public void unselect(String mode){
+        this.mode = mode;
+        if (mode.equals("standing")) {
+            isSelected = false;
+        }
         for (Square square : availableMoves) {
             square.reach(false);
         }
@@ -161,6 +144,8 @@ public abstract class Unit extends JPanel {
     public boolean isLeader(){
         return isLeader;
     }
+    public String getMode() {return mode;}
+
     public void setMode(String mode){
         this.mode = mode;
     }
@@ -183,7 +168,7 @@ public abstract class Unit extends JPanel {
         queue.add(new Node(board,start/board.getWidth(), start%board.getWidth()));
         nodes[start] = true;
         Node n = new Node(board,board.getHeight(),board.getWidth());
-        Node node = new Node(board,board.getHeight(),board.getWidth());
+        Node node;
         while (!queue.isEmpty()){
             n = queue.poll();
             int i = n.getRow();

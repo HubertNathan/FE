@@ -34,7 +34,7 @@ public class Selector {
         resizeImages(48,48);
     }
     public void moveCursor(String dir){
-        if (unit != null){unit.setMode("standing");}
+        if (unit != null && unit.getMode().equals("select")){unit.setMode("standing");}
         switch (dir) {
             case "up":
                 if (y > 0) {
@@ -95,7 +95,7 @@ public class Selector {
         return unit;
     }
     public void selectUnit(Unit unit){
-        if (selectedUnit != null){selectedUnit.unselect();}
+        if (selectedUnit != null){selectedUnit.unselect("standing");}
         selectedUnit = unit.select();
     }
 

@@ -1,10 +1,15 @@
 package GameEngine;
 
 import GUI.ReadMapFile;
+import GUI.ResizableImage;
 import Units.Unit;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 
 import javax.imageio.ImageIO;
+
 import java.awt.*;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,7 +46,6 @@ public class Board{
             OriginalSquareMap.put(i, ImageIO.read(new File("src/GUI/ColorSquares/"+i+".png")));
             ColorSquareMap.put(i, ImageIO.read(new File("src/GUI/ColorSquares/"+i+".png")));
         }
-            resizeColouredSquares(48,48);
     }
     public Square get(int i, int j){
         return board[i][j];
@@ -84,7 +88,7 @@ public class Board{
     public ArrayList<Unit> getUnits(){
         return units;
     }
-    public void draw(Graphics2D g2, int i, int j,int scaleX,int scaleY, BufferedImage texture) {
+    public void draw(Graphics2D g2, int i, int j, int scaleX, int scaleY, BufferedImage texture) {
         g2.drawImage(texture, (int) scaleX * j, (int) scaleY * i,(int) scaleX,(int) scaleY, null);
     }
     public void draw(Graphics2D g2, int i, int j,int scaleX,int scaleY) {
@@ -93,21 +97,30 @@ public class Board{
     public void draw(Graphics2D g2){
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                g2.drawImage(board[i][j].getOriginalTexture(),16 * j,16 * i,null);
+                //g2.drawImage(board[i][j].getOriginalTexture(),16 * j,16 * i,null);
             }
         }
     }
+    public Canvas drawFX(Canvas canvas) {
+        GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                graphicsContext.drawImage((board[i][j].getOriginalTexture()),j*16,i*16);
+            }
+        }
+    return canvas;
+    }
     public void draw(Graphics2D g2, int i, int j,int scaleX,int scaleY,boolean forceRedraw) {
         if (forceRedraw) {
-            BufferedImage texture = board[i][j].getOriginalTexture();
-            draw(g2, i, j, scaleX, scaleY, texture);
+            //BufferedImage texture = board[i][j].getOriginalTexture();
+            //draw(g2, i, j, scaleX, scaleY, texture);
         }
     }
     public void drawColouredSquares(Graphics2D g2, int scaleX, int scaleY, int animFrame,boolean drawBlueSquares){
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
                 if (board[i][j].isReachable()) {
-                    draw(g2,i,j,scaleX,scaleY);
+                    draw(g2, i, j, scaleX, scaleY,true);
                     g2.drawImage(ColorSquareMap.get(1+animFrame%16), scaleX*j,scaleY*i,null);
                 }
             }

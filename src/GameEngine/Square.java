@@ -1,12 +1,15 @@
 package GameEngine;
 
+import GUI.ReadMapFile;
+import GUI.ResizableImage;
 import Terrains.*;
 import Units.Unit;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.scene.image.Image;
 
 public class Square {
     private static final Map<Integer, String > terrainNames = new HashMap<>(){
@@ -43,13 +46,13 @@ public class Square {
             put(29, "Wall");
             put(30, "Wall_Weak");
         }};
-    BufferedImage originalTexture;
+    ResizableImage originalTexture;
     private BufferedImage texture;
     private Terrain terrain = new VoidTile();
     private Unit unit = null;
     private boolean isReachable = false;
 
-    public Square(BufferedImage image){
+    public Square(ResizableImage image){
         this.originalTexture = image;
     }
     public void  setTerrainType(int terrainType){
@@ -104,10 +107,10 @@ public class Square {
     public void setUnit(Unit unit) {
         this.unit = unit;
     }
-    public void setOriginalTexture(BufferedImage texture){
+    public void setOriginalTexture(ResizableImage texture){
         this.originalTexture = texture;
     }
-    public BufferedImage getOriginalTexture(){
+    public ResizableImage getOriginalTexture(){
         return originalTexture;
     }
     public Terrain getTerrain(){
@@ -119,5 +122,9 @@ public class Square {
     }
     public boolean isReachable(){
         return isReachable;
+    }
+
+    public static void main(String[] args) throws FileNotFoundException {
+        Square sq = new Square(new ReadMapFile("CH1").getTileSetData());
     }
 }

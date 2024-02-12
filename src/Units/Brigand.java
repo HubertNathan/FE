@@ -1,5 +1,7 @@
 package Units;
 
+import GUI.ResizableImage;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -27,8 +29,8 @@ public class Brigand extends Unit{
     }
     @Override
     public void load() throws IOException {
-        standingSprites = ImageIO.read(new File("Sprites/Brigand/standingSprites.png"));
-        selectSprites = ImageIO.read(new File("Sprites/Brigand/movingSprites.png"));
+        standingSprites = new ResizableImage("file:Sprites/Brigand/standingSprites.png");
+        selectSprites = new ResizableImage("file:Sprites/Brigand/movingSprites.png");
     }
     public Unit copy() throws IOException {
         return new Brigand(name);

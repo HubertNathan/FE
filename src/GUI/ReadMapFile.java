@@ -1,10 +1,10 @@
 package GUI;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Stream;
@@ -13,8 +13,9 @@ public class ReadMapFile {
     private final String path2;
     private final List<String> map = new ArrayList<>();
     private int[] dimensions;
-    private BufferedImage tileSetData;
+    private ResizableImage tileSetData;
     private String chapter;
+    private String Objectives;
     private final List<String> terrains = new ArrayList<>();
     public ReadMapFile() throws FileNotFoundException {
         path1 = "MapGeneration/Maps/CH1.map";
@@ -28,13 +29,14 @@ public class ReadMapFile {
         loadMap();
         loadTerrain();
     }
-    private void loadMap() throws FileNotFoundException {
+    private void loadMap() {
         try {
             File mapFile = new File(path1);
             Scanner mapReader = new Scanner(mapFile);
             chapter = mapReader.nextLine();
+            Objectives = mapReader.nextLine();
             String tileSet = mapReader.nextLine();
-            tileSetData = ImageIO.read(new File("MapGeneration/Tilesets/" + tileSet + ".png"));
+            tileSetData =  new ResizableImage("file:MapGeneration/Tilesets/" + tileSet + ".png");
             dimensions = Stream.of(mapReader.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
             while (mapReader.hasNextLine()) {
                 map.addAll(Arrays.asList(mapReader.nextLine().split(" ")));
@@ -42,8 +44,6 @@ public class ReadMapFile {
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
     private void loadTerrain () throws FileNotFoundException {
@@ -62,7 +62,7 @@ public class ReadMapFile {
         return map;
     }
 
-    public BufferedImage getTileSetData() {
+    public ResizableImage getTileSetData() {
         return tileSetData;
     }
     public String getChapter(){
@@ -70,6 +70,10 @@ public class ReadMapFile {
     }
     public List<String> getTerrains(){
         return terrains;}
+
+    public String getObjectives() {
+        return Objectives;
+    }
 
     public static void main(String[] args) throws FileNotFoundException {
         ReadMapFile mapFile = new ReadMapFile("CH1");
