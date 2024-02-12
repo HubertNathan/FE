@@ -19,7 +19,7 @@ public class Bridge extends Terrain {
             put("Nomad_Troopers", 1);
         }});
         id = 0;
-        name = "Void";
+        name = "Bridge";
         def = 0;
         avoid = 0;
         heal = 0;

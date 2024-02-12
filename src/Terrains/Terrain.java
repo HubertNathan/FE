@@ -24,6 +24,8 @@ public abstract class Terrain {
     public int getHeal(){
         return heal;
     }
+    public String defToString(){return Integer.toString(def);}
+    public String avoToString(){return Integer.toString(avoid);}
     @Override
     public String toString() {
         return name;

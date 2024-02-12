@@ -30,11 +30,11 @@ public class Lyn_Lord extends Lord{
     public void draw(Graphics2D g, int i, int j, int scaleX, int scaleY, int animFrame) {
         if (scaleX<=0 || scaleY<=0){return;}
         if (mode.equals("standing")) {
-            int animStep = animation(animFrame);
+            int animStep = animation(animFrame, false);
             BufferedImage sprite = resizedStandingSprites.getSubimage(0, animStep * (int) scaleY, (int)scaleX, (int) scaleY);
             g.drawImage(sprite, (int) (scaleX) * j, (int) (scaleY) * (i)-(int)(scaleY)/16, null);
         }
-        else if (mode.equals("select")) {
+        else  {
             super.draw(g,i,j,scaleX,scaleY,animFrame);
         }
     }

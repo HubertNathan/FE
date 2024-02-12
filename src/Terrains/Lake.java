@@ -20,7 +20,7 @@ public class Lake extends Terrain {
 
         }});
         id = 9;
-        name = "Mountain";
+        name = "Lake";
         def = 1;
         avoid = 30;
         heal = 0;

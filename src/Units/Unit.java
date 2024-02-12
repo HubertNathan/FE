@@ -39,7 +39,6 @@ public abstract class Unit extends JPanel {
     protected ArrayList<Square> availableMoves;
 
     Unit(String name, Map<String, Integer> stats) throws IOException {
-        this.board = board;
         LVL = stats.get("LVL");
         HP = stats.get("HP");
         Str = stats.get("Str");
@@ -57,20 +56,29 @@ public abstract class Unit extends JPanel {
         resizedSelectSprites = selectSprites;
         resizeSprites(96, 96);
     }
+    public abstract void load() throws IOException;
+
     public void draw(Graphics2D g, int i, int j, int scaleX, int scaleY, int animFrame) {
         if(scaleX<=0 || scaleY<=0){return;}
         if (mode.equals("standing")) {
-            int animStep = animation(animFrame);;
+            int animStep = animation(animFrame,false);;
             BufferedImage sprite = resizedStandingSprites.getSubimage(0, animStep * 2*(int) scaleY, (int)scaleX, 2*(int) scaleY);
-            g.drawImage(sprite, (int) (scaleX) * j, (int) (scaleY) * (i-1), null);
+            g.drawImage(sprite, scaleX * j, scaleY * (i-1), null);
         }
         else if (mode.equals("select")) {
-            int animStep = animation((2*animFrame)%36);
-            BufferedImage sprite = resizedSelectSprites.getSubimage(0, (12 + animStep) *2* (int)scaleY, 2*(int)scaleX, 2*(int)scaleY);
-            g.drawImage(sprite, (int) (scaleX) * j - (int) (scaleX)/2, (int) (scaleY) * (i - 1), null);
+            int animStep = animation((2*animFrame)%36,false);
+            BufferedImage sprite = resizedSelectSprites.getSubimage(0, (12 + animStep) *2* (int)scaleY, 2* scaleX, 2*(int)scaleY);
+            g.drawImage(sprite, scaleX * j - scaleX /2, scaleY * (i - 1), null);
+        }
+        else if (mode.equals("moving")){
+            int animStep = animation((2*animFrame)%36,true);
+            System.out.println(animStep);
+            BufferedImage sprite = resizedSelectSprites.getSubimage(0, (animStep)*2*scaleY,2*scaleX,2*scaleY);
+            sprite = flipSprite(sprite);
+            g.drawImage(sprite, scaleX * j - scaleX /2, scaleY * (i - 1), null);
+
         }
     }
-
     public void resizeSprites(int newW, int  newH) {
         if(newW<=0 || newH<=0){return;}
         Image tmp1 = standingSprites.getScaledInstance(newW, 3*2*newH, Image.SCALE_SMOOTH);
@@ -84,9 +92,14 @@ public abstract class Unit extends JPanel {
         g2d.drawImage(tmp2, 0, 0, null);
         g2d.dispose();
     }
-    public abstract void load() throws IOException;
-    public int animation(int animFrame) {
-        return ((animFrame > 0) ? 1 : 0) + ((animFrame > 2) ? 1 : 0) - ((animFrame > 18) ? 1 : 0) - ((animFrame > 20) ? 1 : 0);
+    public int animation(int animFrame, boolean moving) {
+        if (!moving) return ((animFrame > 0) ? 1 : 0) + ((animFrame > 2) ? 1 : 0) - ((animFrame > 18) ? 1 : 0) - ((animFrame > 20) ? 1 : 0);
+        else return ((animFrame > 9) ? 1 : 0) + ((animFrame > 18) ? 1 : 0) + ((animFrame > 27) ? 1 : 0);
+    }
+    public BufferedImage flipSprite(BufferedImage sprite){
+        BufferedImage tmp = new BufferedImage(sprite.getWidth(),sprite.getHeight(),BufferedImage.TYPE_INT_ARGB);
+        tmp.createGraphics().drawImage(sprite,sprite.getHeight(),sprite.getWidth(),0,0,0,sprite.getHeight(),sprite.getWidth(),0,null);
+        return tmp;
     }
 
     public ArrayList<Square> findMoves (ArrayList<Square> availableMoves, int mov, int i, int j){
@@ -122,7 +135,7 @@ public abstract class Unit extends JPanel {
         }
     }
     public Unit select(){
-        mode = "select";
+        mode = "moving";
         isSelected = true;
         findMoves();
         for (Square square : availableMoves) {
@@ -130,9 +143,11 @@ public abstract class Unit extends JPanel {
         }
         return this;
     }
-    public void unselect(){
-        mode = "standing";
-        isSelected = false;
+    public void unselect(String mode){
+        this.mode = mode;
+        if (mode.equals("standing")) {
+            isSelected = false;
+        }
         for (Square square : availableMoves) {
             square.reach(false);
         }
@@ -161,6 +176,8 @@ public abstract class Unit extends JPanel {
     public boolean isLeader(){
         return isLeader;
     }
+    public String getMode() {return mode;}
+
     public void setMode(String mode){
         this.mode = mode;
     }
@@ -183,7 +200,7 @@ public abstract class Unit extends JPanel {
         queue.add(new Node(board,start/board.getWidth(), start%board.getWidth()));
         nodes[start] = true;
         Node n = new Node(board,board.getHeight(),board.getWidth());
-        Node node = new Node(board,board.getHeight(),board.getWidth());
+        Node node;
         while (!queue.isEmpty()){
             n = queue.poll();
             int i = n.getRow();

@@ -20,10 +20,9 @@ public class Wall_Weak extends Terrain {
 
         }});
         id = 30;
-        name = "Wall(Weak)";
+        name = "Wall?";
         def = 0;
         avoid = 0;
         heal = 0;
-
     }
 }

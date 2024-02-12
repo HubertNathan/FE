@@ -107,7 +107,7 @@ public class Board{
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
                 if (board[i][j].isReachable()) {
-                    draw(g2,i,j,scaleX,scaleY);
+                    draw(g2, i, j, scaleX, scaleY);
                     g2.drawImage(ColorSquareMap.get(1+animFrame%16), scaleX*j,scaleY*i,null);
                 }
             }

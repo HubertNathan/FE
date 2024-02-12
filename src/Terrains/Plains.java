@@ -19,7 +19,7 @@ public class Plains extends Terrain {
             put("Nomad_Troopers",1);
         }});
         id = 17;
-        name = "Plains";
+        name = "Plain";
         def = 0;
         avoid = 0;
         heal = 0;

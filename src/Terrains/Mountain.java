@@ -21,7 +21,7 @@ public class Mountain extends Terrain {
 
         }});
         id = 14;
-        name = "Mountain";
+        name = "Mntn";
         def = 1;
         avoid = 30;
         heal = 0;

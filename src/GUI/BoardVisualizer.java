@@ -35,6 +35,7 @@ public class BoardVisualizer extends JPanel{
     ArrayList<Integer> currentPath;
     Unit movingUnit;
     Unit tempUnit = null;
+    OverWorldMenu overWorldMenu;
     public BoardVisualizer(ReadMapFile mapReader, Board board, Selector selector, GameState gs) throws IOException {
         currentPath = new ArrayList<>();
         currentTime = System.nanoTime();
@@ -51,6 +52,8 @@ public class BoardVisualizer extends JPanel{
         board.draw(mapGraphics);
         bufferImage = new BufferedImage(tileSize* width,tileSize*height, BufferedImage.TYPE_INT_ARGB);
         bufferImageGraphics = bufferImage.createGraphics();
+        overWorldMenu = new OverWorldMenu(board);
+
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
@@ -60,6 +63,7 @@ public class BoardVisualizer extends JPanel{
         this.addKeyListener(KeyH);
         this.setFocusable(true);
         this.selector = selector;
+        overWorldMenu.updateTerrainIcon(selector.getSquare().getTerrain().defToString(),selector.getSquare().getTerrain().avoToString(),selector.getSquare().getTerrain().toString());
     }
     public void paintComponent(Graphics g){
         super.paintComponents(g);
@@ -69,11 +73,12 @@ public class BoardVisualizer extends JPanel{
         Graphics2D g2 = (Graphics2D) g;
         try {
             update();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
         g2.drawImage(bufferImage,0,0,null);
         g2.dispose();
+        bufferImageGraphics.dispose();
     }
     public void resizeImages(int newH, int newW) throws InterruptedException, IOException {
         if (newH == 0 || newW == 0){return;}
@@ -89,9 +94,11 @@ public class BoardVisualizer extends JPanel{
                 unit.resizeSprites(newW, newH);
             }
         }
+        overWorldMenu.resizeImage(newW,newH);
         animate();
     }
     public void animate() throws InterruptedException, IOException {
+        bufferImageGraphics = bufferImage.createGraphics();
         xx = this.getWidth()/this.getWidthValue();
         yy = this.getHeight()/this.getHeightValue();
         //System.out.println(xx+" "+yy);
@@ -116,6 +123,7 @@ public class BoardVisualizer extends JPanel{
             tempUnit = null;
         }
         selector.draw(bufferImageGraphics,xx,yy,animFrame%36);
+        overWorldMenu.draw(bufferImageGraphics,board.getWidth(),board.getHeight(),xx,yy);
         repaint();
     }
     public void clearBoard(int scaleX,int scaleY) {
@@ -134,6 +142,7 @@ public class BoardVisualizer extends JPanel{
         board.draw(bufferImageGraphics, (selector.getRow() + 1) % board.getHeight(), (selector.getCol() + 1) % board.getWidth(), scaleX, scaleY);
         board.draw(bufferImageGraphics, selector.getRow(), (selector.getCol() + 1) % board.getWidth(), scaleX, scaleY);
         board.draw(bufferImageGraphics, (selector.getRow() + board.getHeight() - 1) % board.getHeight(), (selector.getCol() + 1) % board.getWidth(), scaleX, scaleY);
+        overWorldMenu.draw(bufferImageGraphics, board.getWidth(), board.getHeight(), xx,yy);
     }
     public void clearBoard(){
         xx = this.getWidth()/this.getWidthValue();
@@ -142,7 +151,7 @@ public class BoardVisualizer extends JPanel{
 
     }
 
-    public void update() throws InterruptedException {
+    public void update() throws InterruptedException, IOException {
         long bufferTime = (long) 1000000000/(20);
         if (KeyH.isArrowPressed() && currentTime + bufferTime < System.nanoTime()) {
             clearBoard();
@@ -164,7 +173,7 @@ public class BoardVisualizer extends JPanel{
             esc();
         }
     }
-    public long moveSelector(){
+    public long moveSelector() throws IOException {
         if (KeyH.isUpPressed()){
             selector.moveCursor("up");
         } else if (KeyH.isDownPressed()) {
@@ -174,6 +183,7 @@ public class BoardVisualizer extends JPanel{
         } else if (KeyH.isRightPressed()) {
             selector.moveCursor("right");
         }
+        overWorldMenu.updateTerrainIcon(selector.getSquare().getTerrain().defToString(),selector.getSquare().getTerrain().avoToString(),selector.getSquare().getTerrain().toString());
         return System.nanoTime();
     }
     private void enter() throws InterruptedException {
@@ -190,6 +200,7 @@ public class BoardVisualizer extends JPanel{
             }
             selector.draw(bufferImageGraphics,xx,yy,animFrame%36);
             movingUnit = selector.getSelectedUnit();
+            selector.getSelectedUnit().setMode("standing");
             selector.unSelectUnit();
 
         }
@@ -208,7 +219,8 @@ public class BoardVisualizer extends JPanel{
 
     public void esc(){
         resetBoard();
-        selector.getSelectedUnit().unselect();
+        if (selector.getSelectedUnit().equals(selector.getUnit())){selector.getSelectedUnit().unselect("select");}
+        else selector.getSelectedUnit().unselect("standing");
         for (Unit unit : board.getUnits()) {
             if (unit != null) unit.draw(bufferImageGraphics, unit.getYValue(), unit.getXValue(), xx, yy,animFrame%36);
         }
