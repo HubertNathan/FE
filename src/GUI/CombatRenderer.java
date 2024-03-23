@@ -1,6 +1,7 @@
 package GUI;
 
 import GameEngine.Board;
+import GameEngine.CombatAnimationHandler;
 import GameEngine.CombatHandler;
 import GameEngine.TextInterpreter;
 import Units.Unit;
@@ -14,6 +15,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -30,17 +32,7 @@ public class CombatRenderer {
         addUnitNames(attacker,defender);
         addNumbers();
         addWeaponIcons(attacker,defender);
-        Transition t = new Transition() {
-            {
-                setCycleDuration(Duration.seconds(10));
-                setOnFinished(e -> app.revertToGameScene());
-            }
-            @Override
-            protected void interpolate(double v) {
-
-            }
-        };
-        t.play();
+        playCombatAnimation(attacker,defender);
     }
 
     @SuppressWarnings("DuplicatedCode")
@@ -172,5 +164,13 @@ public class CombatRenderer {
             }
         }
         return output;
+    }
+    private void playCombatAnimation(Unit attacker, Unit defender) throws FileNotFoundException {
+        ImageView A_IMV = new ImageView();
+        A_IMV.setFitWidth(3*240);
+        A_IMV.setFitHeight(3*160);
+        root.getChildren().add(A_IMV);
+        CombatAnimationHandler attack =new CombatAnimationHandler(defender,CombatAnimationHandler.MELEE_CRITICAL);
+        attack.play(A_IMV);
     }
 }

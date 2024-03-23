@@ -23,9 +23,11 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         Lyn_Lord lyn = new Lyn_Lord();
         ImageView imv = new ImageView();
-        imv.setFitWidth(3*248);
+        imv.setFitWidth(3*240);
         imv.setFitHeight(3*160);
-        new CombatAnimationHandler(lyn,"*Melee Critical*").play(imv);
+        CombatAnimationHandler animation = new CombatAnimationHandler(lyn,"*Melee Attack*");
+        System.out.println(animation.getHitFrame());
+        animation.play(imv);
         Pane pane = new Pane();
         pane.getChildren().add(imv);
         Scene scene = new Scene(pane);
