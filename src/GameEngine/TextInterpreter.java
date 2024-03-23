@@ -1,7 +1,13 @@
 package GameEngine;
 
+import GUI.ResizableImage;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -10,17 +16,27 @@ import java.util.HashMap;
 public class TextInterpreter {
     String mode;
     BufferedImage symbols;
+    ResizableImage symbolsAsImg;
     HashMap<Character,int[]> TxtToIndex;
+    HashMap<Character, Image> NumToImg;
 
     TextInterpreter(String mode) throws IOException {
         this.mode = mode;
         load();
     }
-    TextInterpreter() throws IOException {
-        new TextInterpreter("normal");
+    public TextInterpreter() throws IOException {
+        mode = "normal";
+        load();
     }
     public void load() throws IOException {
         symbols = ImageIO.read((new File(("Resources/FE7Symbols.png"))));
+        symbolsAsImg = new ResizableImage("file:Resources/FE7Symbols.png",472,274);
+        NumToImg = new HashMap<>(){{
+            for (int i = 48; i < 58; i++) {
+            put((char)(i),new Image("file:Resources/TerrainNumbers/"+(i-48)+".png",6*8,6*7,false,false));
+            }
+        }};
+
         TxtToIndex = new HashMap<>();
         TxtToIndex.put('A', new int[]{153, 49, 6});
         TxtToIndex.put('B', new int[]{162, 49, 6});
@@ -93,31 +109,16 @@ public class TextInterpreter {
         TxtToIndex.put('9', new int[]{225, 104, 8});
         TxtToIndex.put('0', new int[]{234, 104, 8});
     }
-    public BufferedImage convertTerrainNumbersToBImg(String txt) throws IOException {
+    public Image convertTNumToImg(String txt) {
         char[] txtToChar = txt.toCharArray();
-        BufferedImage txtToImg;
-        txtToImg = new BufferedImage(8 * txtToChar.length, 7, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = txtToImg.createGraphics();
+        Canvas canvas = new Canvas(6*8*txt.length(),6*7);
+        GraphicsContext g = canvas.getGraphicsContext2D();
         for (int i = 0; i < txtToChar.length; i++) {
-            switch (txtToChar[i]) {
-                case '0':
-                    g.drawImage(ImageIO.read(new File("Resources/TerrainNumbers/0.png")), 8 * i, 0, null);
-                    break;
-                case '1':
-                    g.drawImage(ImageIO.read(new File("Resources/TerrainNumbers/1.png")), 8 * i, 0, null);
-                    break;
-                case '2':
-                    g.drawImage(ImageIO.read(new File("Resources/TerrainNumbers/2.png")), 8 * i, 0, null);
-                    break;
-                case '3':
-                    g.drawImage(ImageIO.read(new File("Resources/TerrainNumbers/3.png")), 8 * i, 0, null);
-                    break;
-            }
+            g.drawImage(NumToImg.get(txtToChar[i]),i*6*8,0);
         }
-        g.dispose();
-        return txtToImg;
+        return g.getCanvas().snapshot(new SnapshotParameters() {{setFill(Color.TRANSPARENT);}},null);
     }
-    public BufferedImage convertText(String txt, String colour){
+    public Image convertTxt(String colour, String txt) throws IOException {
         int colourOffset = switch (colour) {
             case "green" -> 67;
             case "gray" -> 134;
@@ -126,74 +127,41 @@ public class TextInterpreter {
         int len = 1;
         char[] txtToChar = txt.toCharArray();
         for (int i = 0; i < txt.length(); i++) {
+            if (txtToChar[i] == ' ') {
+                len += 3;
+            } else len += TxtToIndex.get(txtToChar[i])[2] - 1;
+        }
+        Canvas canvas = new Canvas(len*6,13*6);
+        GraphicsContext g = canvas.getGraphicsContext2D();
+        for (int i = 0; i < txt.length(); i++) {
             if (txtToChar[i] == ' '){
                 len+=3;
             } else len+= TxtToIndex.get(txtToChar[i])[2]-1;
         }
-        BufferedImage txtToImg = new BufferedImage(len,13,BufferedImage.TYPE_INT_ARGB);
-        Graphics g = txtToImg.getGraphics();
         int offset = 0;
         for (int i = 0; i < txt.length(); i++) {
-            if (txtToChar[i] == ' '){
-                offset+=3;
+            if (txtToChar[i] == ' ') {
+                offset += 3;
             } else {
-                g.drawImage(symbols.getSubimage(TxtToIndex.get(txtToChar[i])[0], TxtToIndex.get(txtToChar[i])[1] + colourOffset, TxtToIndex.get(txtToChar[i])[2], 13), offset, 0, null);
+                int yOffset;
+                if ("0123456789".indexOf(txtToChar[i]) != -1) yOffset = 6;
+                else yOffset = 0;
+                g.drawImage(symbolsAsImg.getSubimage(6 * TxtToIndex.get(txtToChar[i])[0], 6 * (TxtToIndex.get(txtToChar[i])[1] + colourOffset), 6 * TxtToIndex.get(txtToChar[i])[2], 6 * 13 - yOffset), 6 * offset, 0);
                 offset += TxtToIndex.get(txtToChar[i])[2] - 1;
             }
         }
-            g.dispose();
-        return txtToImg;
+        return g.getCanvas().snapshot(new SnapshotParameters(){{setFill(Color.TRANSPARENT);}},null);
     }
-    public BufferedImage convertText(String text1,String text2,String colour1, String colour2) {
-        BufferedImage txtToImg1 = convertText(text1, colour1);
-        BufferedImage txtToImg2 = convertText(text2, colour2);
-        BufferedImage img = new BufferedImage(txtToImg1.getWidth() + txtToImg2.getWidth(), txtToImg1.getHeight() + txtToImg2.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics g = img.createGraphics();
-        g.drawImage(txtToImg1, 0, 0, null);
-        g.drawImage(txtToImg2, txtToImg1.getWidth(), 0, null);
-        g.dispose();
-        return img;
-    }
-    public BufferedImage convertNum(String num, String colour){
-        char[] numToChar = num.toCharArray();
-        int len = 8* numToChar.length;
-        BufferedImage numToImg = new BufferedImage(len,10,BufferedImage.TYPE_INT_ARGB);
-        Graphics g = numToImg.createGraphics();
-        for (int i = 0; i < num.length(); i++) {
-            switch (numToChar[i]){
-                case '0':
-                    g.drawImage(symbols.getSubimage(1,1,8,10),8*i,0,null);
-                    break;
-                case '1' :
-                    g.drawImage(symbols.getSubimage(10,1,8,10),8*i,0,null);
-                    break;
-                case '2':
-                    g.drawImage(symbols.getSubimage(19,1,8,10),8*i,0,null);
-                    break;
-                case '3' :
-                    g.drawImage(symbols.getSubimage(28,1,8,10),8*i,0,null);
-                    break;
-                case '4':
-                    g.drawImage(symbols.getSubimage(37,1,8,10),8*i,0,null);
-                    break;
-                case '5' :
-                    g.drawImage(symbols.getSubimage(46,1,8,10),8*i,0,null);
-                    break;
-                case '6':
-                    g.drawImage(symbols.getSubimage(55,1,8,10),8*i,0,null);
-                    break;
-                case '7' :
-                    g.drawImage(symbols.getSubimage(64,1,8,10),8*i,0,null);
-                    break;
-                case '8':
-                    g.drawImage(symbols.getSubimage(73,1,8,10),8*i,0,null);
-                    break;
-                case '9' :
-                    g.drawImage(symbols.getSubimage(82,1,8,10),8*i,0,null);
-                    break;
-            }
+    public Image convertBattleNumbers(int n) throws IOException {
+        int len = Integer.toString(n).length();
+        char[] intToChar = Integer.toString(n).toCharArray();
+        Canvas canvas = new Canvas(len*8*6,8*6);
+        int offset = 0;
+        for (int i = 0; i < len; i++) {
+            canvas.getGraphicsContext2D().drawImage(symbolsAsImg.getSubimage(6+9*6*Integer.parseInt(Character.toString(intToChar[i])),34*6,8*6,8*6),offset,0);
+            offset+=8*6;
         }
-        g.dispose();
-        return numToImg;
+        return canvas.snapshot(new SnapshotParameters(){{setFill(Color.TRANSPARENT);}},null);
     }
+
 }

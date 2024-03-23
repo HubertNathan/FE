@@ -26,6 +26,7 @@ public class ResizableImage extends Image {
         WritableImage image = new WritableImage(reader, x, y, w, h);
         return new ResizableImage(getImgAsInputStream(image));
     }
+
     public Image resize(int targetWidth, int targetHeight, boolean preserveRatio) throws IOException {
         ImageView imageView = new ImageView(this);
         imageView.setPreserveRatio(preserveRatio);

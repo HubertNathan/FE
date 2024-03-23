@@ -1,11 +1,8 @@
 package Units;
 
 import GUI.ResizableImage;
+import Weapon.Axe;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -13,26 +10,29 @@ public class Brigand extends Unit{
     public Brigand(String name) throws IOException {
         super(name, new HashMap<>() {{
             put("LVL", 1);
-            put("HP", 60);
-            put("Str", 20);
+            put("HP", 20);
+            put("Str", 5);
             put("Mag", 0);
-            put("Skl", 20);
-            put("Spd", 20);
-            put("Lck", 30);
-            put("Def", 20);
-            put("Res", 20);
+            put("Skl", 1);
+            put("Spd", 5);
+            put("Lck", 0);
+            put("Def", 3);
+            put("Res", 0);
             put("Mov", 5);
-            put("Con", 20);
-        }});
+            put("Con", 12);
+        }}, new Axe(Axe.IronAxe));
         unitType = "Bandits";
         load();
+        color = "red";
     }
     @Override
     public void load() throws IOException {
-        standingSprites = new ResizableImage("file:Sprites/Brigand/standingSprites.png");
-        selectSprites = new ResizableImage("file:Sprites/Brigand/movingSprites.png");
+        standingSprites = new ResizableImage("file:Resources/Sprites/Brigand/standingSprites.png",32,96);
+        selectSprites = new ResizableImage("file:Resources/Sprites/Brigand/movingSprites.png",32,480);
     }
-    public Unit copy() throws IOException {
-        return new Brigand(name);
+
+    @Override
+    public String getResourceDirectory() {
+        return "file:Resources/Sprites/Brigand/";
     }
 }

@@ -1,11 +1,8 @@
 package Units;
 
 import GUI.ResizableImage;
+import Weapon.Lance;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -23,15 +20,17 @@ public class Cavalier extends Unit {
             put("Res", 20);
             put("Mov", 4);
             put("Con", 20);
-        }});
+        }}, new Lance(Lance.IronLance));
         unitType = "KnightsA";
         load();
     }
     public void load() throws IOException {
-        standingSprites = new ResizableImage("file:Sprites/Cavalier/standingSprites.png");
-        selectSprites = new ResizableImage("file:Sprites/Cavalier/movingSprites.png");
+        standingSprites = new ResizableImage("file:Resources/Sprites/Cavalier/standingSprites.png",32,96);
+        selectSprites = new ResizableImage("file:Resources/Sprites/Cavalier/movingSprites.png",32,480);
     }
-    public Unit copy() throws IOException {
-        return new Cavalier(name);
+
+    @Override
+    public String getResourceDirectory() {
+        return "file:Resources/Sprites/Cavalier/";
     }
 }

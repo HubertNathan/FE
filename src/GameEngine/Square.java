@@ -1,15 +1,11 @@
 package GameEngine;
 
-import GUI.ReadMapFile;
 import GUI.ResizableImage;
 import Terrains.*;
 import Units.Unit;
 
-import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
-import javafx.scene.image.Image;
 
 public class Square {
     private static final Map<Integer, String > terrainNames = new HashMap<>(){
@@ -46,14 +42,19 @@ public class Square {
             put(29, "Wall");
             put(30, "Wall_Weak");
         }};
+    int x;
+    int y;
     ResizableImage originalTexture;
-    private BufferedImage texture;
     private Terrain terrain = new VoidTile();
     private Unit unit = null;
     private boolean isReachable = false;
+    private boolean inRange = false;
 
-    public Square(ResizableImage image){
+
+    public Square(ResizableImage image,int i, int j){
         this.originalTexture = image;
+        x = j;
+        y = i;
     }
     public void  setTerrainType(int terrainType){
         String terrainName = terrainNames.get(terrainType);
@@ -98,18 +99,14 @@ public class Square {
                 this.terrain = new VoidTile();
         }
     }
-    public Terrain getTerrainType(){
-        return terrain;
-    }
+
     public Unit getUnit() {
         return unit;
     }
     public void setUnit(Unit unit) {
         this.unit = unit;
     }
-    public void setOriginalTexture(ResizableImage texture){
-        this.originalTexture = texture;
-    }
+
     public ResizableImage getOriginalTexture(){
         return originalTexture;
     }
@@ -124,7 +121,10 @@ public class Square {
         return isReachable;
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
-        Square sq = new Square(new ReadMapFile("CH1").getTileSetData());
-    }
+    public void range(boolean b){inRange = b;}
+    public boolean inRange(){return inRange;}
+
+
+    public int getXValue(){return x;}
+    public int getYValue(){return y;}
 }
