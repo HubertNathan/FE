@@ -1,0 +1,187 @@
+*Melee Attack*
+1-Lance_000.png
+//C1C                               #Play light horse stepping SFE; pitch decreases
+20-Lance_001.png
+3-Lance_002.png
+//C04                               #Prepare HP depletion routine; needed to animate return to standing frame after hit; Magic only.
+1-Lance_002.png
+//C1A                               #Normal hit
+//C24                               #Play sword slashing air SFE
+//C21                               #Play hit SFE (sounds like Knight Lord with sword's hit)
+20-Lance_003.png
+//C01                               #NOP
+//C22                               #Play short sword swinging SFE
+2-Lance_004.png
+2-Lance_005.png
+5-Lance_006.png
+//C1E                               #Similar to 0x1D; a bit louder
+3-Lance_007.png
+13-Lance_008.png
+3-Lance_009.png
+3-Lance_010.png
+1-Lance_011.png
+1-Lance_012.png
+20-Lance_013.png
+//C1D                               #Play light horse stepping SFE; pitch increases
+7-Lance_014.png
+3-Lance_015.png
+7-Lance_016.png
+//C1D                               #Play light horse stepping SFE; pitch increases
+//C06                               #Begin opponent's turn after hit.next code 0D.
+3-Lance_016.png
+3-Lance_017.png
+//C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Melee Critical*
+1-Lance_000.png
+1-Lance_018.png
+2-Lance_019.png
+10-Lance_020.png
+//C38                               #Play heavy spear spinning SFE
+3-Lance_021.png
+3-Lance_022.png
+3-Lance_023.png
+//C38                               #Play heavy spear spinning SFE
+3-Lance_024.png
+3-Lance_025.png
+3-Lance_026.png
+//C22                               #Play short sword swinging SFE
+3-Lance_027.png
+3-Lance_028.png
+4-Lance_029.png
+10-Lance_030.png
+//C23                               #Play shorter sword swinging SFE
+3-Lance_031.png
+3-Lance_000.png
+//C1C                               #Play light horse stepping SFE; pitch decreases
+20-Lance_001.png
+3-Lance_002.png
+//C04                               #Prepare HP depletion routine; needed to animate return to standing frame after hit; Magic only.
+1-Lance_002.png
+//C0C                               #Critical hit
+//C24                               #Play sword slashing air SFE
+//C21                               #Play hit SFE (sounds like Knight Lord with sword's hit)
+20-Lance_003.png
+//C01                               #NOP
+//C22                               #Play short sword swinging SFE
+2-Lance_004.png
+2-Lance_005.png
+5-Lance_006.png
+//C1E                               #Similar to 0x1D; a bit louder
+3-Lance_007.png
+13-Lance_008.png
+3-Lance_009.png
+3-Lance_010.png
+1-Lance_011.png
+1-Lance_012.png
+20-Lance_013.png
+//C1D                               #Play light horse stepping SFE; pitch increases
+7-Lance_014.png
+3-Lance_015.png
+7-Lance_016.png
+//C1D                               #Play light horse stepping SFE; pitch increases
+//C06                               #Begin opponent's turn after hit.next code 0D.
+3-Lance_016.png
+3-Lance_017.png
+//C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Ranged Attack*
+1-Lance_000.png
+3-Lance_032.png
+8-Lance_033.png
+6-Lance_034.png
+13-Lance_035.png
+//C25                               #Play wing flap SFE
+//C05                               #Call spell associated with equipped weapon
+3-Lance_036.png
+20-Lance_037.png
+//C01                               #NOP
+//C06                               #Begin opponent's turn after hit.next code 0D.
+3-Lance_038.png
+//C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Ranged Critical*
+1-Lance_000.png
+1-Lance_018.png
+2-Lance_019.png
+10-Lance_020.png
+//C38                               #Play heavy spear spinning SFE
+3-Lance_021.png
+3-Lance_022.png
+3-Lance_023.png
+//C38                               #Play heavy spear spinning SFE
+3-Lance_024.png
+3-Lance_025.png
+3-Lance_026.png
+//C22                               #Play short sword swinging SFE
+3-Lance_027.png
+3-Lance_028.png
+4-Lance_029.png
+10-Lance_030.png
+//C23                               #Play shorter sword swinging SFE
+3-Lance_031.png
+3-Lance_032.png
+8-Lance_033.png
+6-Lance_034.png
+13-Lance_035.png
+//C25                               #Play wing flap SFE
+//C05                               #Call spell associated with equipped weapon
+3-Lance_036.png
+20-Lance_037.png
+//C01                               #NOP
+//C06                               #Begin opponent's turn after hit.next code 0D.
+3-Lance_038.png
+//C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Dodge Melee*
+//C02                               #Start of dodge
+//C0E                               #Start of dodging frames (should go after standing frame and before dodging animation)
+3-Lance_039.png
+20-Lance_040.png
+//C01                               #NOP
+3-Lance_039.png
+//C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Dodge Ranged*
+//C02                               #Start of dodge
+C0E                               #Start of dodging frames (should go after standing frame and before dodging animation)
+3-Lance_039.png
+20-Lance_040.png
+C01                               #NOP
+3-Lance_039.png
+//C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Attack Missed*
+1-Lance_000.png
+//C1C                               #Play light horse stepping SFE; pitch decreases
+20-Lance_001.png
+3-Lance_002.png
+//C04                               #Prepare HP depletion routine; needed to animate return to standing frame after hit; Magic only.
+1-Lance_002.png
+//C1A                               #Normal hit
+//C24                               #Play sword slashing air SFE
+//C21                               #Play hit SFE (sounds like Knight Lord with sword's hit)
+20-Lance_003.png
+//C01                               #NOP
+//C22                               #Play short sword swinging SFE
+2-Lance_004.png
+2-Lance_005.png
+5-Lance_006.png
+//C1E                               #Similar to 0x1D; a bit louder
+3-Lance_007.png
+13-Lance_008.png
+3-Lance_009.png
+3-Lance_010.png
+1-Lance_011.png
+1-Lance_012.png
+20-Lance_013.png
+//C1D                               #Play light horse stepping SFE; pitch increases
+7-Lance_014.png
+3-Lance_015.png
+7-Lance_016.png
+//C1D                               #Play light horse stepping SFE; pitch increases
+//C06                               #Begin opponent's turn after hit.next code 0D.
+3-Lance_016.png
+3-Lance_017.png
+//C0D                               #End of dodge animation. preceeded by 0x06
+~~~
