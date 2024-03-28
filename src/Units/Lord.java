@@ -29,5 +29,7 @@ public abstract class Lord extends Unit {
     }
 
     @Override
-    public abstract String getResourceDirectory();
+    public String getResourceDirectory() {
+        return "file:Resources/Sprites/Lord/";
+    }
 }

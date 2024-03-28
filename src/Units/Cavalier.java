@@ -23,6 +23,11 @@ public class Cavalier extends Unit {
         }}, new Lance(Lance.IronLance));
         unitType = "KnightsA";
         load();
+        skin = switch (name){
+            case "Kent" -> "Kent";
+            case "Sain" -> "Sain";
+            default -> "Cavalier";
+        };
     }
     public void load() throws IOException {
         standingSprites = new ResizableImage("file:Resources/Sprites/Cavalier/standingSprites.png",32,96);

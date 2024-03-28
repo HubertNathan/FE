@@ -12,15 +12,11 @@ public class Lyn_Lord extends Lord{
     public Lyn_Lord() throws IOException {
         super("Lyn", new Sword(Sword.IronSword));
         load();
+        skin = "/Lyn";
     }
     public void load() throws IOException {
         standingSprites = new ResizableImage("file:Resources/Sprites/Lord/Lyn/standingSprites.png",32,96);
         selectSprites = new ResizableImage ("file:Resources/Sprites/Lord/Lyn/movingSprites.png",32,480);
-    }
-
-    @Override
-    public String getResourceDirectory() {
-        return "file:Resources/Sprites/Lord/Lyn/";
     }
 
     public ImageView getSprite(int animFrame) throws IOException {

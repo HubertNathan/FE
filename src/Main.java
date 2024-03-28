@@ -1,14 +1,9 @@
-import GameEngine.CombatAnimationHandler;
+import GameEngine.CombatAnimation;
+import Units.Brigand;
 import Units.Lyn_Lord;
-import Weapon.Axe;
-import Weapon.Lance;
-import Weapon.Sword;
+import javafx.animation.ParallelTransition;
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -22,14 +17,23 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Lyn_Lord lyn = new Lyn_Lord();
+        Brigand brg = new Brigand("Brigand");
         ImageView imv = new ImageView();
+        ImageView imv1 = new ImageView();
         imv.setFitWidth(3*240);
         imv.setFitHeight(3*160);
-        CombatAnimationHandler animation = new CombatAnimationHandler(lyn,"*Melee Attack*");
-        System.out.println(animation.getHitFrame());
-        animation.play(imv);
+        imv1.setFitWidth(3*240);
+        imv1.setFitHeight(3*160);
+        CombatAnimation animation = new CombatAnimation(lyn,CombatAnimation.MISS);
+        CombatAnimation animation1 = new CombatAnimation(brg,CombatAnimation.DODGE_MELEE,animation.getHitFrame(),animation.getFrameNumber());
+
+        animation.play(imv1);
+        animation1.play(imv);
+        //System.out.println(animation.getCombatAnimations());
+        //System.out.println(animation.getFrameNumber());
+        System.out.println(animation1.getCombatAnimations());
         Pane pane = new Pane();
-        pane.getChildren().add(imv);
+        pane.getChildren().addAll(imv,imv1);
         Scene scene = new Scene(pane);
         scene.setFill(Color.BLACK);
         stage.setScene(scene);

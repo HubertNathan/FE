@@ -40,6 +40,26 @@ public class CombatHandler {
         if (attacker.getColor().equals("blue")) return Arrays.asList(defHit,defDmg,defCrit,atkHit,atkDmg,atkCrit);
         return Arrays.asList(atkHit,atkDmg,atkCrit,defHit,defDmg,defCrit);
     }
+    public List<Boolean> getTurn(){
+        boolean Hit1 = false, Crit1 = false, Hit2 = false, Crit2 = false;
+        System.out.println(atkHit+"  "+defHit);
+        int diceRoll1 = (int)(Math.random()*100);
+        int diceRoll2 = (int)(Math.random()*100);
+        int critRoll = (int)(Math.random()*100);
+        if ((diceRoll1+diceRoll2)/2 < atkHit) {
+            Hit1 = true;
+            if (critRoll < atkCrit) Crit1 = true;
+        }
+        diceRoll1 = (int)(Math.random()*100);
+        diceRoll2 = (int)(Math.random()*100);
+        critRoll = (int)(Math.random()*100);
+        System.out.println(diceRoll1+diceRoll2+"  "+defHit);
+        if ((diceRoll1+diceRoll2)/2 < defHit) {;
+            Hit2 = true;
+            if (critRoll < defCrit) Crit2 = true;
+        }
+        return Arrays.asList(Hit1,Crit1,Hit2,Crit2);
+    }
 
     private int calculateAS(Unit attacker){
         if (attacker.getCon() >= attacker.getWieldedWeapon().getWeight()){

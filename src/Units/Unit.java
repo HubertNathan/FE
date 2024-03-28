@@ -28,6 +28,7 @@ public abstract class Unit extends Pane {
     protected int Res;
     protected int Mov;
     protected int Con;
+
     protected String name;
     protected String unitType;
     protected ResizableImage standingSprites;
@@ -44,6 +45,7 @@ public abstract class Unit extends Pane {
     private ArrayList<Square> squaresInRange;
     protected ImageView imv;
     protected Weapon wieldedWeapon;
+    protected String skin = "";
 
     Unit(String name, Map<String, Integer> stats, Weapon weapon) throws IOException {
         wieldedWeapon = weapon;
@@ -100,6 +102,9 @@ public abstract class Unit extends Pane {
         return color;
     }
 
+    public String getSkin() {
+        return skin;
+    }
     public Image getSprites(){
         return mode.equals("standing")?standingSprites:selectSprites;
     }
@@ -107,6 +112,7 @@ public abstract class Unit extends Pane {
     public Weapon getWieldedWeapon() {
         return wieldedWeapon;
     }
+
     public void equipWeapon(Weapon weapon){
         wieldedWeapon = weapon;
     }

@@ -142,7 +142,7 @@ public class FireEmblemApp extends Application {
         root.getChildren().add(arrowPane);
         colouredSquaresAnimation = new ColouredSquaresAnimation(board, colouredSquaresPane);
         board.setUnit(new Lyn_Lord(), 2, 2, true);
-        board.setUnit(new Cavalier("Sain"), 4, 4);
+        board.setUnit(new Cavalier("Kent"), 4, 4);
         board.setUnit(new Brigand("Brigand"), 6, 5);
         displayUnits(board);
         root.getChildren().add(MenuPane);

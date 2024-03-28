@@ -24,6 +24,9 @@ public class Brigand extends Unit{
         unitType = "Bandits";
         load();
         color = "red";
+        skin = switch (name) {
+            default     -> "Brigand";
+        };
     }
     @Override
     public void load() throws IOException {
