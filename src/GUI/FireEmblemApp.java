@@ -7,8 +7,8 @@ import GUI.Animations.SpriteAnimation;
 import GameEngine.Board;
 import GameEngine.Cursor;
 import GameEngine.GameInterface;
-import GameEngine.Square;
-import Units.Brigand;
+import GameEngine.MenuPointer;
+import Units.Bandit;
 import Units.Cavalier;
 import Units.Lyn_Lord;
 import Units.Unit;
@@ -31,57 +31,77 @@ import javafx.util.Pair;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class FireEmblemApp extends Application {
-    private Stage window;
-    private Scene gameScene;
+    private static Stage window;
     private Board board;
-    private Pane root = new Pane();
-    private final Pane unitPane = new Pane();
-    private final Pane colouredSquaresPane = new Pane();
-    private final Pane arrowPane = new Pane();
-    private Pane MenuPane = new Pane();
-    private GameInterface gameInterface;
+    private static Pane root = new Pane();
+    private static Scene gameScene = new Scene(root);
+    private final Pane unitPane = new Pane(), colouredSquaresPane = new Pane(), arrowPane = new Pane();
+    public final Pane MenuPane = new Pane();
+    public GameInterface gameInterface;
     ColouredSquaresAnimation colouredSquaresAnimation;
     private ImageView background;
+    private final MenuPointer menuPointer = new MenuPointer();
     private Cursor cursor;
-    double tileWidth = 48;
-    double tileHeight = 48;
+    double tileWidth = 48, tileHeight = 48;
     ArrayList<Integer> currentPath;
     Transition CursorAnimation;
-    final HashMap<String,Image> arrows = new HashMap<>(){
+    int menuId = 0;
+    private static final ParallelTransition sprites = new ParallelTransition();
+    final HashMap<String, Image> arrows = new HashMap<>() {
         {
-            put("01", new Image(getClass().getResource("Arrows/01.png").toExternalForm(),92,92,false,false));
-            put("02", new Image(getClass().getResource("Arrows/02.png").toExternalForm(),92,92,false,false));
-            put("03", new Image(getClass().getResource("Arrows/03.png").toExternalForm(),92,92,false,false));
-            put("04", new Image(getClass().getResource("Arrows/04.png").toExternalForm(),92,92,false,false));
-            put("10", new Image(getClass().getResource("Arrows/10.png").toExternalForm(),92,92,false,false));
-            put("12", new Image(getClass().getResource("Arrows/12.png").toExternalForm(),92,92,false,false));
-            put("13", new Image(getClass().getResource("Arrows/13.png").toExternalForm(),92,92,false,false));
-            put("14", new Image(getClass().getResource("Arrows/14.png").toExternalForm(),92,92,false,false));
-            put("20", new Image(getClass().getResource("Arrows/20.png").toExternalForm(),92,92,false,false));
-            put("23", new Image(getClass().getResource("Arrows/23.png").toExternalForm(),92,92,false,false));
-            put("24", new Image(getClass().getResource("Arrows/24.png").toExternalForm(),92,92,false,false));
-            put("30", new Image(getClass().getResource("Arrows/30.png").toExternalForm(),92,92,false,false));
-            put("34", new Image(getClass().getResource("Arrows/34.png").toExternalForm(),92,92,false,false));
-            put("40", new Image(getClass().getResource("Arrows/40.png").toExternalForm(),92,92,false,false));
+            put("01", new Image(getClass().getResource("Arrows/01.png").toExternalForm(), 92, 92, false, false));
+            put("02", new Image(getClass().getResource("Arrows/02.png").toExternalForm(), 92, 92, false, false));
+            put("03", new Image(getClass().getResource("Arrows/03.png").toExternalForm(), 92, 92, false, false));
+            put("04", new Image(getClass().getResource("Arrows/04.png").toExternalForm(), 92, 92, false, false));
+            put("10", new Image(getClass().getResource("Arrows/10.png").toExternalForm(), 92, 92, false, false));
+            put("12", new Image(getClass().getResource("Arrows/12.png").toExternalForm(), 92, 92, false, false));
+            put("13", new Image(getClass().getResource("Arrows/13.png").toExternalForm(), 92, 92, false, false));
+            put("14", new Image(getClass().getResource("Arrows/14.png").toExternalForm(), 92, 92, false, false));
+            put("20", new Image(getClass().getResource("Arrows/20.png").toExternalForm(), 92, 92, false, false));
+            put("23", new Image(getClass().getResource("Arrows/23.png").toExternalForm(), 92, 92, false, false));
+            put("24", new Image(getClass().getResource("Arrows/24.png").toExternalForm(), 92, 92, false, false));
+            put("30", new Image(getClass().getResource("Arrows/30.png").toExternalForm(), 92, 92, false, false));
+            put("34", new Image(getClass().getResource("Arrows/34.png").toExternalForm(), 92, 92, false, false));
+            put("40", new Image(getClass().getResource("Arrows/40.png").toExternalForm(), 92, 92, false, false));
 
-        }};
+        }
+    };
+
+    public int getMenuId() {
+        return menuId;
+    }
+    public ImageView getActiveMenu(int i){
+        return (ImageView) MenuPane.getChildren().get(MenuPane.getChildren().size()-i);
+    }
 
     public void b() throws IOException {
         root = (Pane) gameScene.getRoot();
-        new CombatRenderer(this,window,board,window.getScene(),board.get(2,2).getUnit(),board.get(6,5).getUnit());
+        new CombatRenderer(this, window, board, board.get(2, 2).getUnit(), board.get(6, 5).getUnit());
     }
-    public void revertToGameScene(){
-        System.out.println(root.getChildren());
+
+    public void revertToGameScene() {
         gameScene.setRoot(root);
         window.setScene(gameScene);
+        menuId = 0;
+        gameInterface.transitionIn(new HashMap<>(){{
+            put((ImageView) MenuPane.getChildren().getFirst(), new Pair<>(3,false));
+            put((ImageView) MenuPane.getChildren().getLast(), new Pair<>(2,false));
+        }});
+        cursor.getSelectedUnit().endTurn();
+        cursor.unSelectUnit();
+        cursor.getIMV().setVisible(true);
+        cursor.setColor("yellow");
+        colouredSquaresAnimation.stop();
     }
 
     class CursorTransition extends Transition {
         ImageView imv;
         public Image backup;
-        CursorTransition(ImageView imv){
+
+        CursorTransition(ImageView imv) {
             this.imv = imv;
             cursor1 = cursor;
             cursor.setIMV(imv);
@@ -98,8 +118,12 @@ public class FireEmblemApp extends Application {
             put(1, new Image("file:src/GUI/CursorSprites/Cursor1.png", 192, 192, false, false));
             put(2, new Image("file:src/GUI/CursorSprites/Cursor2.png", 192, 192, false, false));
             put(3, new Image("file:src/GUI/CursorSprites/Cursor3.png", 192, 192, false, false));
+            put(11, new Image("file:src/GUI/CursorSprites/Cursor11.png", 192, 192, false, false));
+            put(12, new Image("file:src/GUI/CursorSprites/Cursor12.png", 192, 192, false, false));
+            put(13, new Image("file:src/GUI/CursorSprites/Cursor13.png", 192, 192, false, false));
         }};
-        public Image getImage(){
+
+        public Image getImage() {
             return backup;
         }
 
@@ -110,28 +134,29 @@ public class FireEmblemApp extends Application {
 
         @Override
         protected void interpolate(double k) {
-            int index = updateAnimation(36 * k);
-            if ((index != lastIndex && cursor.getUnit() == null)||cursor.getSelectedUnit() != null) {
+            int index = updateAnimation(36 * k) + (cursor.getColor().equals("red") ? 10 : 0);
+            if ((index != lastIndex) && ((cursor.getUnit() != null && !cursor.getUnit().getColor().equals("blue")) || cursor.getUnit() == null || cursor.getSelectedUnit() != null)) {
                 backup = CursorMap.get(index);
                 imv.setImage(CursorMap.get(index));
             }
             lastIndex = index;
         }
 
-    };
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         window = stage;
-        gameScene = new Scene(root);
         gameScene.setFill(Color.WHITE);
         ReadMapFile mapFile = new ReadMapFile("CH1");
         loadBoard(mapFile);
         loadCursor();
         gameInterface = new GameInterface(board);
-        MenuPane.getChildren().addAll(gameInterface.drawMenu(Integer.toString(cursor.getSquare().getTerrain().getDef()),Integer.toString(cursor.getSquare().getTerrain().getAvoid()),cursor.getSquare().getTerrain().toString(),mapFile.getObjectives()));
+        MenuPane.getChildren().addAll(gameInterface.drawMenu(Integer.toString(cursor.getSquare().getTerrain().getDef()), Integer.toString(cursor.getSquare().getTerrain().getAvoid()), cursor.getSquare().getTerrain().toString(), mapFile.getObjectives()));
         window.setTitle("Fire Emblem");
         window.show();
         window.setScene(gameScene);
+        colouredSquaresAnimation = new ColouredSquaresAnimation(board, colouredSquaresPane);
         addEventListeners();
     }
 
@@ -140,17 +165,18 @@ public class FireEmblemApp extends Application {
         loadBackground();
         root.getChildren().add(colouredSquaresPane);
         root.getChildren().add(arrowPane);
-        colouredSquaresAnimation = new ColouredSquaresAnimation(board, colouredSquaresPane);
         board.setUnit(new Lyn_Lord(), 2, 2, true);
         board.setUnit(new Cavalier("Kent"), 4, 4);
-        board.setUnit(new Brigand("Brigand"), 6, 5);
+        board.setUnit(new Bandit("Bandit",new int[] {1,20,3,0,1,4,0,3,0,5,12}, "red"), 6, 5);
+        board.setUnit(new Bandit("Zugu","red"),5,5);
+        board.setUnit(new Cavalier("Sain"),5,6);
         displayUnits(board);
         root.getChildren().add(MenuPane);
     }
 
     private void loadBackground() {
         background = new ImageView(board.drawFX(new Canvas(16 * board.getWidth(), 16 * board.getHeight())).snapshot(null, new WritableImage(16 * board.getWidth(), 16 * board.getHeight())));
-        ResizeBackground(6);
+        ResizeBackground();
         background.setFitWidth(48 * board.getWidth());
         background.setFitHeight(48 * board.getHeight());
         root.getChildren().add(background);
@@ -175,8 +201,8 @@ public class FireEmblemApp extends Application {
             setUnitFitWidth(tileWidth);
             setCursorFitWidth(tileWidth);
             setSquaresFitWidth(tileWidth);
-            setArrowsFitWidth((Double) oldVal / board.getWidth(),tileWidth);
-            setMenuFitWidth((Double) oldVal / board.getWidth(),tileWidth);
+            setArrowsFitWidth((Double) oldVal / board.getWidth(), tileWidth);
+            setMenuFitWidth((Double) oldVal / board.getWidth(), tileWidth);
 
         });
 
@@ -186,41 +212,44 @@ public class FireEmblemApp extends Application {
             setUnitFitHeight(tileHeight);
             setCursorFitHeight(tileHeight);
             setSquaresFitHeight(tileHeight);
-            setArrowsFitHeight(((Double)oldVal-37 )/ board.getHeight(),tileHeight);
-            setMenuFitHeight(((Double)oldVal-37)/ board.getHeight(),tileHeight);
+            setArrowsFitHeight(((Double) oldVal - 37) / board.getHeight(), tileHeight);
+            setMenuFitHeight(((Double) oldVal - 37) / board.getHeight(), tileHeight);
         });
         gameScene.setOnKeyPressed(new KeyEventHandler(this));
     }
 
-    private void ResizeBackground(int scaleFactor) {
+    private void ResizeBackground() {
         Image image = background.getImage();
         background = new ImageView(
                 resample(
-                        image,
-                        scaleFactor
+                        image
                 )
         );
     }
 
-    private Image resample(Image input, int scaleFactor) {
+    private Image resample(Image input) {
         final int W = (int) input.getWidth();
         final int H = (int) input.getHeight();
-        final int S = scaleFactor;
+        final int S = 6;
 
+        return getResampledImage(input, W, H, S);
+    }
+
+    static Image getResampledImage(Image input, int w, int h, int s) {
         WritableImage output = new WritableImage(
-                W * S,
-                H * S
+                w * s,
+                h * s
         );
 
         PixelReader reader = input.getPixelReader();
         PixelWriter writer = output.getPixelWriter();
 
-        for (int y = 0; y < H; y++) {
-            for (int x = 0; x < W; x++) {
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
                 final int argb = reader.getArgb(x, y);
-                for (int dy = 0; dy < S; dy++) {
-                    for (int dx = 0; dx < S; dx++) {
-                        writer.setArgb(x * S + dx, y * S + dy, argb);
+                for (int dy = 0; dy < s; dy++) {
+                    for (int dx = 0; dx < s; dx++) {
+                        writer.setArgb(x * s + dx, y * s + dy, argb);
                     }
                 }
             }
@@ -256,6 +285,7 @@ public class FireEmblemApp extends Application {
             }
         });
     }
+
     private void setUnitFitHeight(double height) {
         board.getUnits().forEach(unit -> {
             if (unit != null) {
@@ -265,62 +295,53 @@ public class FireEmblemApp extends Application {
             }
         });
     }
+
     private void setCursorFitWidth(double width) {
         cursor.getIMV().setFitWidth(width * 2);
         cursor.getIMV().setTranslateX(cursor.getXValue() * width - width / 2);
     }
+
     private void setCursorFitHeight(double height) {
         cursor.getIMV().setFitHeight(height * 2);
         cursor.getIMV().setTranslateY(cursor.getYValue() * height - height / 2);
     }
-    private void setArrowsFitWidth(double oldWidth, double newWidth){
-        arrowPane.getChildren().forEach(imv->{
+
+    private void setArrowsFitWidth(double oldWidth, double newWidth) {
+        arrowPane.getChildren().forEach(imv -> {
             if (imv instanceof ImageView) {
                 ((ImageView) imv).setFitWidth(newWidth);
-                imv.setTranslateX((imv.getTranslateX()/oldWidth)*newWidth);
+                imv.setTranslateX((imv.getTranslateX() / oldWidth) * newWidth);
             }
         });
     }
-    private void setArrowsFitHeight(double oldHeight, double newHeight){
-        arrowPane.getChildren().forEach(imv->{
+
+    private void setArrowsFitHeight(double oldHeight, double newHeight) {
+        arrowPane.getChildren().forEach(imv -> {
             if (imv instanceof ImageView) {
                 ((ImageView) imv).setFitHeight(newHeight);
-                imv.setTranslateY((imv.getTranslateY()/oldHeight)*newHeight);
+                imv.setTranslateY((imv.getTranslateY() / oldHeight) * newHeight);
             }
         });
     }
-    private void setMenuFitWidth(double oldW, double newW){
+
+    private void setMenuFitWidth(double oldW, double newW) {
         MenuPane.getChildren().forEach(pane -> {
-            ((ImageView)pane).setFitWidth((((ImageView) pane).getFitWidth()/oldW)*newW);
-            pane.setTranslateX(pane.getTranslateX()/oldW*newW);
+            ((ImageView) pane).setFitWidth((((ImageView) pane).getFitWidth() / oldW) * newW);
+            pane.setTranslateX(pane.getTranslateX() / oldW * newW);
         });
     }
-    private void setMenuFitHeight(double oldH, double newH){
-        System.out.println(newH+"   "+oldH);
+
+    private void setMenuFitHeight(double oldH, double newH) {
         MenuPane.getChildren().forEach(pane -> {
-            ((ImageView)pane).setFitHeight(((ImageView) pane).getImage().getHeight()/96*newH);
-            if (pane.getTranslateY() > board.getHeight()*newH/3) {
-                System.out.println(pane.getTranslateY());
-                System.out.println("coucou");
+            ((ImageView) pane).setFitHeight(((ImageView) pane).getImage().getHeight() / 96 * newH);
+            if (pane.getTranslateY() > board.getHeight() * newH / 3) {
                 pane.setTranslateY(board.getHeight() * newH - ((ImageView) pane).getFitHeight());
-            } else pane.setTranslateY(((ImageView) pane).getTranslateY()*newH/oldH);
+            } else pane.setTranslateY(pane.getTranslateY() * newH / oldH);
 
         });
-    }
-
-    private void displayUnit(Unit unit) {
-        ImageView imv = new ImageView(unit.getSprites());
-        imv.setViewport(new Rectangle2D(0, 6 * 16, 6 * 16, 6 * 16));
-        imv.setFitWidth(48);
-        imv.setFitHeight(48);
-        Animation animation = new SpriteAnimation(unit, imv);
-        animation.setCycleCount(Animation.INDEFINITE);
-        animation.play();
-        root.getChildren().add(imv);
     }
 
     private void displayUnits(Board board) {
-        ParallelTransition spriteAnimation = new ParallelTransition();
         board.getUnits().forEach(unit -> {
             if (unit != null) {
 
@@ -333,20 +354,21 @@ public class FireEmblemApp extends Application {
                 imv.setTranslateY(unit.getYValue() * 48 - 48);
                 unit.setImv(imv);
                 unitPane.getChildren().add(imv);
-                Animation animation = new SpriteAnimation(unit, imv);
-                animation.setCycleCount(Animation.INDEFINITE);
-                spriteAnimation.getChildren().add(animation);
+                Animation animation = unit.getSpriteAnimation();
+                sprites.getChildren().add(animation);
             }
         });
         root.getChildren().add(unitPane);
-        spriteAnimation.play();
+        sprites.play();
 
     }
 
+    public static ParallelTransition getSprites() {
+        return sprites;
+    }
     private void displayCursor(ImageView imv) {
         CursorAnimation = new CursorTransition(imv);
         CursorAnimation.play();
-        if(CursorAnimation instanceof CursorTransition) ((CursorTransition) CursorAnimation).getImage();
     }
 
     @SuppressWarnings("IntegerDivisionInFloatingPointContext")
@@ -355,8 +377,8 @@ public class FireEmblemApp extends Application {
         int lastDir = path.getLast() - path.get(path.size() - 2);
         ImageView imv1;
         ImageView imv2;
-        if(firstDir ==1) imv1 = new ImageView(arrows.get("04"));
-        else if (firstDir == -1)  imv1 = new ImageView(arrows.get("02"));
+        if (firstDir == 1) imv1 = new ImageView(arrows.get("04"));
+        else if (firstDir == -1) imv1 = new ImageView(arrows.get("02"));
         else if (firstDir == board.getWidth()) imv1 = new ImageView(arrows.get("03"));
         else imv1 = new ImageView(arrows.get("01"));
 
@@ -369,50 +391,55 @@ public class FireEmblemApp extends Application {
         imv1.setFitWidth(tileWidth);
         imv2.setFitHeight(tileHeight);
         imv2.setFitWidth(tileWidth);
-        imv1.setTranslateX(path.getFirst()%board.getWidth()*tileWidth);
+        imv1.setTranslateX(path.getFirst() % board.getWidth() * tileWidth);
         imv1.setTranslateY(path.getFirst() / board.getWidth() * tileHeight);
-        imv2.setTranslateX(path.getLast()%board.getWidth() * tileWidth);
+        imv2.setTranslateX(path.getLast() % board.getWidth() * tileWidth);
         imv2.setTranslateY(path.getLast() / board.getWidth() * tileHeight);
-        arrowPane.getChildren().addAll(imv1,imv2);
+        arrowPane.getChildren().addAll(imv1, imv2);
 
 
-
-        for (int i = 1; i < path.size()-1; i++) {
+        for (int i = 1; i < path.size() - 1; i++) {
             int node = path.get(i);
-            int previousNode = path.get(i-1);
-            int nextNode = path.get(i+1);
+            int previousNode = path.get(i - 1);
+            int nextNode = path.get(i + 1);
             ImageView imv = new ImageView();
 
-            String trajectory = "";
-
-            int previousDir = node - previousNode;
-            if (previousDir == 1) trajectory+="2";
-            else if ((previousDir == -1)) trajectory+="4";
-            else if ((previousDir == board.getWidth())) trajectory+="1";
-            else trajectory+="3";
-
-            int nextDir = nextNode - node;
-            if (nextDir == 1) trajectory+="4";
-            else if ((nextDir == -1)) trajectory+="2";
-            else if ((nextDir == board.getWidth())) trajectory+="3";
-            else trajectory+="1";
-
-            switch (trajectory){
-                case "41" : trajectory = "14";break;
-                case "42" : trajectory = "24";break;
-                case "43" : trajectory = "34";break;
-                case "32" : trajectory = "23";break;
-                case "31" : trajectory = "13";break;
-                case "21" : trajectory = "12";break;
-            }
+            String trajectory = getTrajectory(node, previousNode, nextNode);
             imv.setImage(arrows.get(trajectory));
             imv.setFitHeight(tileHeight);
             imv.setFitWidth(tileWidth);
-            imv.setTranslateX(path.get(i)%board.getWidth()*tileWidth);
+            imv.setTranslateX(path.get(i) % board.getWidth() * tileWidth);
             imv.setTranslateY(path.get(i) / board.getWidth() * tileHeight);
             arrowPane.getChildren().add(imv);
 
         }
+    }
+
+    private String getTrajectory(int node, int previousNode, int nextNode) {
+        String trajectory = "";
+
+        int previousDir = node - previousNode;
+        if (previousDir == 1) trajectory += "2";
+        else if ((previousDir == -1)) trajectory += "4";
+        else if ((previousDir == board.getWidth())) trajectory += "1";
+        else trajectory += "3";
+
+        int nextDir = nextNode - node;
+        if (nextDir == 1) trajectory += "4";
+        else if ((nextDir == -1)) trajectory += "2";
+        else if ((nextDir == board.getWidth())) trajectory += "3";
+        else trajectory += "1";
+
+        trajectory = switch (trajectory) {
+            case "41" -> "14";
+            case "42" -> "24";
+            case "43" -> "34";
+            case "32" -> "23";
+            case "31" -> "13";
+            case "21" -> "12";
+            default -> trajectory;
+        };
+        return trajectory;
     }
 
     public void moveCursor(KeyCode c) throws IOException {
@@ -421,27 +448,27 @@ public class FireEmblemApp extends Application {
         switch (c) {
             case KeyCode.UP:
                 path = cursor.moveCursor("up");
-                cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight/2- tileHeight/16);
-                if (cursor.getXValue()>board.getWidth()/2 && cursor.getYValue() == board.getHeight()/2-1) {
+                cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight / 2 - tileHeight / 16);
+                if (cursor.getXValue() > board.getWidth() / 2 && cursor.getYValue() == board.getHeight() / 2 - 1 && menuId==0) {
                     gameInterface.animate((ImageView) MenuPane.getChildren().getLast(), 2, true);
                 }
                 break;
             case KeyCode.DOWN:
-                path =cursor.moveCursor("down");
-                cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight/2- tileHeight/16);
-                if (cursor.getXValue()>board.getWidth()/2 && cursor.getYValue() == board.getHeight()/2) {
+                path = cursor.moveCursor("down");
+                cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight / 2 - tileHeight / 16);
+                if (cursor.getXValue() > board.getWidth() / 2 && cursor.getYValue() == board.getHeight() / 2 && menuId==0) {
                     gameInterface.animate((ImageView) MenuPane.getChildren().getLast(), 2, false);
                 }
                 break;
             case KeyCode.LEFT:
                 path = cursor.moveCursor("left");
                 cursor.getIMV().setTranslateX(cursor.getXValue() * tileWidth - tileWidth / 2);
-                if (cursor.getXValue()==board.getWidth()/2) {
+                if (cursor.getXValue() == board.getWidth() / 2 && menuId==0) {
                     gameInterface.animate(new HashMap<>() {{
-                            put(((ImageView) MenuPane.getChildren().getFirst()), new Pair<>(3, false));
-                            if (cursor.getYValue()<board.getHeight()/2) {
-                                put(((ImageView) MenuPane.getChildren().getLast()), new Pair<>(2, false));
-                            }
+                        put(((ImageView) MenuPane.getChildren().getFirst()), new Pair<>(3, false));
+                        if (cursor.getYValue() < board.getHeight() / 2) {
+                            put(((ImageView) MenuPane.getChildren().get(1)), new Pair<>(2, false));
+                        }
                     }});
                 }
                 break;
@@ -449,10 +476,10 @@ public class FireEmblemApp extends Application {
                 path = cursor.moveCursor("right");
                 cursor.getIMV().setTranslateX(cursor.getXValue() * tileWidth - tileWidth / 2);
                 //if (board.getWidth()-cursor.getXValue()<8) {
-                if (cursor.getXValue()==board.getWidth()/2+1) {
+                if (cursor.getXValue() == board.getWidth() / 2 + 1 && menuId==0) {
                     gameInterface.animate(new HashMap<>() {{
-                            put(((ImageView) MenuPane.getChildren().getFirst()), new Pair<>(3, true));
-                        if (cursor.getYValue()<board.getHeight()/2) {
+                        put(((ImageView) MenuPane.getChildren().getFirst()), new Pair<>(3, true));
+                        if (cursor.getYValue() < board.getHeight() / 2) {
                             put(((ImageView) MenuPane.getChildren().getLast()), new Pair<>(2, true));
                         }
                     }});
@@ -461,54 +488,155 @@ public class FireEmblemApp extends Application {
             default:
                 path = null;
         }
-        gameInterface.updateTI(((ImageView) MenuPane.getChildren().getFirst()),cursor.getSquare().getTerrain().defToString(),cursor.getSquare().getTerrain().avoToString(),cursor.getSquare().getTerrain().toString());
+        gameInterface.updateTI(((ImageView) MenuPane.getChildren().getFirst()), cursor.getSquare().getTerrain().defToString(), cursor.getSquare().getTerrain().avoToString(), cursor.getSquare().getTerrain().toString());
 
-        if (cursor.getSelectedUnit() != null){
+        if (cursor.getSelectedUnit() != null) {
             if (cursor.getSelectedUnit().getAvailableMoves().contains(cursor.getSquare())) {
-                currentPath = cursor.getSelectedUnit().BFS_Algorithm(cursor.getYValue()*board.getWidth()+cursor.getXValue());
+                currentPath = cursor.getSelectedUnit().BFS_Algorithm(cursor.getYValue() * board.getWidth() + cursor.getXValue());
             }
         }
-        if (cursor.getIMV().getImage().getUrl().equals("file:src/GUI/CursorSprites/Cursor4.png")) cursor.getIMV().setImage(((CursorTransition)CursorAnimation).getImage());
-        if (cursor.getUnit() != null && cursor.getSelectedUnit() == null) {
+        if (cursor.getIMV().getImage().getUrl().equals("file:src/GUI/CursorSprites/Cursor4.png"))
+            cursor.getIMV().setImage(((CursorTransition) CursorAnimation).getImage());
+        if (cursor.getUnit() != null && cursor.getSelectedUnit() == null && cursor.getUnit().getColor().equals("blue")) {
             cursor.getIMV().setImage(new Image("file:src/GUI/CursorSprites/Cursor4.png", 192, 192, false, false));
-            cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight+tileHeight/8);
-        } else cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight/2- tileHeight/16);
-        if (path != null){
+            cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight + tileHeight / 8);
+        } else cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight / 2 - tileHeight / 16);
+        if (path != null) {
             displayPath(path);
         }
 
+    }
 
+    public void moveMenuPointer(KeyCode c,double inf, double sup, int offset) throws IOException {
+        if (c.equals(KeyCode.UP)) {
+            if (menuPointer.getTranslateY() - 3 * 16 < inf) {
+                menuPointer.setTranslateY(menuPointer.getTranslateY() + offset * 3 * 16);
+            } else menuPointer.setTranslateY(menuPointer.getTranslateY() - 3 * 16);
+        }
+        if (c.equals(KeyCode.DOWN)) {
+            if (menuPointer.getTranslateY() + 2 * 3 * 15 > sup) {
+                menuPointer.setTranslateY(menuPointer.getTranslateY() - offset * 3 * 16);
+            } else menuPointer.setTranslateY(menuPointer.getTranslateY() + 3 * 16);
+        }
+        if (menuId == 10){
+            gameInterface.buildWeaponMenu(getActiveMenu(3), cursor.getSelectedUnit(),cursor.getSelectedUnit().getInventory().getWeapons().get((int)(menuPointer.getTranslateY()-27)/48));
+        }
     }
 
     public static void main(String[] args) {
         launch();
     }
 
-    public void enter() {
+    public void enter() throws IOException {
         arrowPane.getChildren().clear();
-        colouredSquaresAnimation.stop();
-        if (cursor.getUnit() != null) {
-            selectUnit();
-            colouredSquaresAnimation.play(tileWidth, tileHeight);
+        switch (menuId) {
+            case 0:
+                if (cursor.getUnit() != null && !cursor.getUnit().getColor().equals("red")) {
+                    cursor.selectUnit(cursor.getUnit());
+                    cursor.getIMV().setTranslateX((cursor.getXValue()-1./2)*tileWidth);
+                    cursor.getIMV().setTranslateY((cursor.getYValue()-9./16)*tileWidth);
+                    colouredSquaresAnimation.play(tileWidth, tileHeight);
+                    gameInterface.transitionOut(new HashMap<>() {{
+                        put((ImageView) MenuPane.getChildren().getFirst(), new Pair<>(3, true));
+                        put((ImageView) MenuPane.getChildren().get(1), new Pair<>(2, true));
+                    }});
+                    menuId += 1;
+                }
+                break;
+            case 1:
+                colouredSquaresAnimation.stop();
+                cursor.getIMV().setVisible(false);
+                Unit movingUnit = cursor.getSelectedUnit();
+                int row = cursor.getYValue(), col = cursor.getXValue();
+                movingUnit.makeMove(row, col, tileWidth, tileHeight, colouredSquaresAnimation);
+                movingUnit.getMoveTransition().setOnFinished(event -> {
+                    ImageView intermediateMenu;
+                    board.setUnit(movingUnit, row, col);
+                    movingUnit.endMove();
+                    try {
+                        intermediateMenu = gameInterface.drawIntermediateMenu(movingUnit.isInRange());
+                        intermediateMenu.setTranslateY(28 * 3);
+                        if (cursor.getXValue() > board.getWidth() / 2) {
+                            intermediateMenu.setTranslateX(12 * 3);
+                        } else {
+                            intermediateMenu.setTranslateX(board.getWidth() * 16 * 3 - 60 * 3);
+                        }
 
-        } else if (cursor.getSelectedUnit() != null){
-            Unit movingUnit = cursor.getSelectedUnit();
+                        MenuPane.getChildren().add(intermediateMenu);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
 
-            movingUnit.makeMove(cursor.getYValue(), cursor.getXValue(),tileWidth,tileHeight);
-            cursor.unSelectUnit();
-            movingUnit.getImv().setTranslateX(movingUnit.getXValue()*tileWidth - tileWidth/2);
-            movingUnit.getImv().setTranslateY(movingUnit.getYValue()*tileHeight- tileHeight);
+                    menuPointer.setTranslateX(intermediateMenu.getTranslateX() - 15 * 3);
+                    menuPointer.setTranslateY(intermediateMenu.getTranslateY() + 3 * 7);
 
+                    MenuPane.getChildren().add(menuPointer);
+                    menuPointer.play();
+                    colouredSquaresAnimation.play();
+                });
+                menuId += 1;
+                break;
+            case 2:
+                menuPointer.stop();
+                MenuPane.getChildren().removeLast();
+                MenuPane.getChildren().removeLast();
+                selectAction(cursor.getSelectedUnit(), cursor.getSelectedUnit().isInRange(), false);
+                break;
+            case 10:
+                cursor.getSelectedUnit().setWieldedWeapon(cursor.getSelectedUnit().getInventory().getWeapons().get((int)(menuPointer.getTranslateY()/tileHeight)-1));
+                menuPointer.stop();
+                MenuPane.getChildren().removeLast();
+                MenuPane.getChildren().removeLast();
+                MenuPane.getChildren().removeLast();
+                MenuPane.getChildren().removeLast();
+                ArrayList<Unit> Enemies = cursor.getSelectedUnit().getAdjacentEnemies();
+                cursor.setTo(Enemies.getFirst(),tileWidth,tileHeight);
+                cursor.setColor("red");
+                cursor.getIMV().setVisible(true);
+                ImageView forecast = gameInterface.drawForecast(cursor.getSelectedUnit(),cursor.getUnit());
+                MenuPane.getChildren().add(forecast);
+                menuId+=1;
+                break;
+            case 11:
+                MenuPane.getChildren().removeLast();
+                root = (Pane) gameScene.getRoot();
+                new CombatRenderer(this, window, board, cursor.getSelectedUnit(), cursor.getUnit());
 
         }
     }
 
-    private void selectUnit() {
-        cursor.selectUnit(cursor.getUnit());
-        Unit movingUnit = cursor.getSelectedUnit();
-        if (movingUnit == null) return;
-        cursor.getIMV().setTranslateY(cursor.getYValue()*tileHeight- tileHeight/2 - tileHeight/16);
-        ArrayList<Square> availableMoves = movingUnit.getAvailableMoves();
-
+    private void selectAction(Unit movingUnit, boolean isAttacking, boolean isTradingItems) throws IOException {
+        switch ((int) menuPointer.getTranslateY() + (isAttacking ? 0 : 48) + (isTradingItems || (isAttacking && (int) menuPointer.getTranslateY() == 105) ? 0 : 48)) {
+            case 105: //Attack
+                List<ImageView> WeaponMenu = gameInterface.drawWeaponMenu(cursor.getSelectedUnit());
+                WeaponMenu.getFirst().setTranslateX(tileWidth * 3 / 4);
+                WeaponMenu.getFirst().setTranslateY(tileHeight * 3 / 4);
+                WeaponMenu.get(1).setTranslateX(window.getWidth() - WeaponMenu.get(1).getImage().getWidth() / 2 - tileWidth * 11 / 16);
+                WeaponMenu.get(1).setTranslateY((window.getHeight() - 37) - WeaponMenu.get(1).getImage().getHeight() / 2 - tileHeight * 11 / 16);
+                WeaponMenu.getLast().setTranslateX(window.getWidth() - WeaponMenu.getLast().getFitWidth() - tileWidth);
+                WeaponMenu.getLast().setTranslateY((window.getHeight() - 37) - WeaponMenu.get(1).getImage().getHeight() / 2 - WeaponMenu.getLast().getFitHeight() - tileHeight * 11 / 16);
+                MenuPane.getChildren().addAll(WeaponMenu);
+                MenuPane.getChildren().add(menuPointer);
+                menuPointer.setTranslateX(tileWidth * 2 / 16);
+                menuPointer.setTranslateY(tileWidth * 19 / 16);
+                menuPointer.play();
+                menuId = 10;
+                break;
+            case 153: //Trade
+                break;
+            case 201: //Item
+                break;
+            case 249: //Wait
+                gameInterface.transitionIn(new HashMap<>(){{
+                    put((ImageView) MenuPane.getChildren().getFirst(), new Pair<>(3,false));
+                    put((ImageView) MenuPane.getChildren().getLast(), new Pair<>(2,false));
+                }});
+                cursor.getSelectedUnit().endTurn();
+                cursor.unSelectUnit();
+                cursor.getIMV().setVisible(true);
+                colouredSquaresAnimation.stop();
+                menuId=0;
+                break;
+        }
     }
 }

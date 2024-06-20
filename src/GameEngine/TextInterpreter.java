@@ -118,7 +118,7 @@ public class TextInterpreter {
         }
         return g.getCanvas().snapshot(new SnapshotParameters() {{setFill(Color.TRANSPARENT);}},null);
     }
-    public Image convertTxt(String colour, String txt) throws IOException {
+    public Image convertTxt(String txt,String colour) throws IOException {
         int colourOffset = switch (colour) {
             case "green" -> 67;
             case "gray" -> 134;
@@ -149,6 +149,33 @@ public class TextInterpreter {
                 g.drawImage(symbolsAsImg.getSubimage(6 * TxtToIndex.get(txtToChar[i])[0], 6 * (TxtToIndex.get(txtToChar[i])[1] + colourOffset), 6 * TxtToIndex.get(txtToChar[i])[2], 6 * 13 - yOffset), 6 * offset, 0);
                 offset += TxtToIndex.get(txtToChar[i])[2] - 1;
             }
+        }
+        return g.getCanvas().snapshot(new SnapshotParameters(){{setFill(Color.TRANSPARENT);}},null);
+    }
+    public Image convertNum(int n) throws IOException {
+        return convertNum(n, false);
+    }
+    public Image convertNum(int n, boolean b) throws IOException {
+        return convertNum(n,"blue", b);
+    }
+    public Image convertNum(int n, String colour, boolean b) throws IOException {
+        GraphicsContext g;
+        int yOffset = switch (colour){
+            case "green" -> 12;
+            case "gray" -> 23;
+            default -> 1;
+        };
+        if (n==100 && b){
+            g = new Canvas(17*6,10*6).getGraphicsContext2D();
+            g.drawImage(symbolsAsImg.getSubimage(122*6,yOffset*6,17*6,10*6),0,0);
+            return g.getCanvas().snapshot(new SnapshotParameters(){{setFill(Color.TRANSPARENT);}},null);
+        }
+        int xOffset = 0;
+        int len = (int)Math.log10(n)+1;
+        g = new Canvas((len*8)*6,10*6).getGraphicsContext2D();
+        for (char c : Integer.toString(n).toCharArray()){
+            g.drawImage(symbolsAsImg.getSubimage(Character.getNumericValue(c)*9*6+6,yOffset*6,8*6,10*6),xOffset*6,0);
+            xOffset+=8;
         }
         return g.getCanvas().snapshot(new SnapshotParameters(){{setFill(Color.TRANSPARENT);}},null);
     }

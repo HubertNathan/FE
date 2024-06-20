@@ -1,48 +1,69 @@
 package GameEngine;
 
+import Items.Weapons.Axe;
+import Items.Weapons.Lance;
+import Items.Weapons.Sword;
+import Items.Weapons.Weapon;
 import Units.Unit;
-import Weapon.*;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class CombatHandler {
-    Board board;
-    int atkHit;
-    int atkDmg;
-    int atkCrit;
-    int defHit;
-    int defDmg;
-    int defCrit;
-    Unit attacker;
+    private final Board board;
+    private final int atkHit;
+    private final int atkDmg;
+    private final int atkCrit;
+    private final int defHit;
+    private final int defDmg;
+    private final int defCrit;
+    private final Unit attacker;
     Unit defender;
-    int weaponTriangle = 0;
 
     public CombatHandler(Unit attacker, Unit defender, Board board){
         this.board = board;
         this.attacker = attacker;
         this.defender = defender;
 
-        weaponTriangle = weaponTriangle(attacker.getWieldedWeapon(),defender.getWieldedWeapon());
-
-        atkDmg = Math.max(calculateAtk(attacker,defender) - calculateDef(defender),0);
-        atkHit = Math.min(Math.max(calculateHit(attacker,defender) - calculateAvoid(defender),0),100);
+        atkDmg = Math.max(calculateAtk(attacker,defender) - calculateDef(defender, board),0) ;
+        atkHit = Math.min(Math.max(calculateHit(attacker,defender) - calculateAvoid(defender, board),0),100);
         atkCrit = Math.max(calculateCrit(attacker) - calculateCritAvoid(defender),0);
 
-        defDmg = Math.max(calculateAtk(defender,attacker) - calculateDef(attacker),0);
-        defHit = Math.min(Math.max(calculateHit(defender,attacker) - calculateAvoid(attacker),0),100);
+        defDmg = Math.max(calculateAtk(defender,attacker) - calculateDef(attacker, board),0);
+        defHit = Math.min(Math.max(calculateHit(defender,attacker) - calculateAvoid(attacker, board),0),100);
         defCrit = Math.max(calculateCrit(defender) - calculateCritAvoid(attacker),0);
 
     }
 
-    public List<Integer> getCalculations(){
-        System.out.println(Arrays.asList(atkHit,atkDmg,atkCrit,defHit,defDmg,defCrit));
-        if (attacker.getColor().equals("blue")) return Arrays.asList(defHit,defDmg,defCrit,atkHit,atkDmg,atkCrit);
-        return Arrays.asList(atkHit,atkDmg,atkCrit,defHit,defDmg,defCrit);
+    public static List<Integer> getUnitCalculations(Unit attacker, Board board) {
+        return Arrays.asList(
+                attacker.getStr()+attacker.getWieldedWeapon().getMight(),
+                attacker.getWieldedWeapon().getCrit() + attacker.getSkl()/2,
+                attacker.getWieldedWeapon().getHit() + 2 * attacker.getSkl() + attacker.getLck()/2,
+                2 * attacker.getSpd() + attacker.getLck()+board.get(attacker.getYValue(),attacker.getXValue()).getTerrain().getAvoid()
+        );
     }
+    public List<Integer> getCombatStats(){
+        return getCombatStats(false);
+    }
+    public List<Integer> getCombatStats(boolean b){
+        if (b) return Arrays.asList(defHit, defDmg, defCrit, atkHit, atkDmg, atkCrit);
+        return Arrays.asList(atkHit, atkDmg, atkCrit, defHit, defDmg, defCrit);
+    }
+    public static List<Integer> getCombatStats(Unit attacker, Unit defender, Board board){
+        return Arrays.asList(
+                Math.max(calculateAtk(attacker,defender) - calculateDef(defender, board),0),
+                Math.min(Math.max(calculateHit(attacker,defender) - calculateAvoid(defender, board),0),100),
+                Math.max(calculateCrit(attacker) - calculateCritAvoid(defender),0),
+
+                Math.max(calculateAtk(defender,attacker) - calculateDef(attacker, board),0),
+                Math.min(Math.max(calculateHit(defender,attacker) - calculateAvoid(attacker, board),0),100),
+                Math.max(calculateCrit(defender) - calculateCritAvoid(attacker),0)
+        );
+    }
+
     public List<Boolean> getTurn(){
-        boolean Hit1 = false, Crit1 = false, Hit2 = false, Crit2 = false;
-        System.out.println(atkHit+"  "+defHit);
+        boolean Hit1 = false, Crit1 = false, Hit2 = false, Crit2 = false, Hit3 = false, Crit3 = false;
         int diceRoll1 = (int)(Math.random()*100);
         int diceRoll2 = (int)(Math.random()*100);
         int critRoll = (int)(Math.random()*100);
@@ -53,45 +74,51 @@ public class CombatHandler {
         diceRoll1 = (int)(Math.random()*100);
         diceRoll2 = (int)(Math.random()*100);
         critRoll = (int)(Math.random()*100);
-        System.out.println(diceRoll1+diceRoll2+"  "+defHit);
-        if ((diceRoll1+diceRoll2)/2 < defHit) {;
+        if ((diceRoll1+diceRoll2)/2 < defHit) {
             Hit2 = true;
             if (critRoll < defCrit) Crit2 = true;
         }
-        return Arrays.asList(Hit1,Crit1,Hit2,Crit2);
+        diceRoll1 = (int)(Math.random()*100);
+        diceRoll2 = (int)(Math.random()*100);
+        critRoll = (int)(Math.random()*100);
+        if ((diceRoll1+diceRoll2)/2 < atkHit) {
+            Hit3 = true;
+            if (critRoll < atkCrit) Crit3 = true;
+        }
+        return Arrays.asList(Hit1,Crit1,Hit2,Crit2,Hit3,Crit3);
     }
 
-    private int calculateAS(Unit attacker){
+    public int calculateAS(Unit attacker){
         if (attacker.getCon() >= attacker.getWieldedWeapon().getWeight()){
             return attacker.getSpd();
         }
         else return attacker.getSpd() + attacker.getCon() - attacker.getWieldedWeapon().getWeight();
     }
-    private int calculateAtk(Unit attacker, Unit defender){
+    private static int calculateAtk(Unit attacker, Unit defender){
         //Atk = (Str || Mag) + Effectiveness * ( Weapon Might + Weapon Triangle ) + Support
         return attacker.getStr() + (attacker.getWieldedWeapon().getMight() + weaponTriangle(attacker.getWieldedWeapon(), defender.getWieldedWeapon()));
     }
-    private int calculateDef(Unit defender){
+    private static int calculateDef(Unit defender, Board board){
         //Df = (Def || Res) + Terrain Defense + Support
         return defender.getDef() +board.get(defender.getYValue(),defender.getXValue()).getTerrain().getDef();
     }
-    private int calculateHit(Unit attacker, Unit defender){
+    private static int calculateHit(Unit attacker, Unit defender){
         //Hit = Weapon Hit + 2 * Skl + Lck/2 + Weapon Triangle + Support Hit
         return attacker.getWieldedWeapon().getHit() + 2 * attacker.getSkl() + attacker.getLck() / 2+15*weaponTriangle(attacker.getWieldedWeapon(), defender.getWieldedWeapon());
     }
-    private int calculateAvoid(Unit defender){
+    private static int calculateAvoid(Unit defender, Board board){
         //Avo = 2 * Attack Speed + Luck + Terrain Avo + Support
         return 2 * defender.getSpd() + defender.getLck()+ board.get(defender.getYValue(),defender.getXValue()).getTerrain().getAvoid();
     }
-    private int calculateCrit(Unit attacker){
+    private static int calculateCrit(Unit attacker){
         // Crit = Weapon Crit + Skl/2 + Support
         return attacker.getWieldedWeapon().getCrit() + attacker.getSkl()/2;
     }
-    private int calculateCritAvoid(Unit defender){
+    private static int calculateCritAvoid(Unit defender){
         // CritAvo = Luck + support
         return defender.getLck();
     }
-    private int weaponTriangle(Weapon atkWeapon, Weapon defWeapon){
+    private static int weaponTriangle(Weapon atkWeapon, Weapon defWeapon){
         int WT = switch (atkWeapon.getType()) {
             case "Sword" -> switch (defWeapon.getType()) {
                 case "Axe" -> 1;

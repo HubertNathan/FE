@@ -3,22 +3,16 @@ package GUI.Animations;
 import Units.Unit;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import javafx.scene.image.ImageView;
-
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 
 
 public class SpriteAnimation extends Transition {
@@ -29,7 +23,6 @@ public class SpriteAnimation extends Transition {
     private int lastIndex;
     private final ImageView imv;
     Unit unit;
-
 
     public SpriteAnimation(Unit unit, ImageView imv){
         this.imv = imv;
@@ -46,7 +39,6 @@ public class SpriteAnimation extends Transition {
         }
         if (unit.getMode().equals("standing")) {
             height = (int) imv.getImage().getHeight() / 3;
-            System.out.println(height);
         } else height = (int) imv.getImage().getHeight() / 15;
         width = (int)imv.getImage().getWidth();
 

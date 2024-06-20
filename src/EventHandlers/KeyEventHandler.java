@@ -2,6 +2,7 @@ package EventHandlers;
 
 import GUI.FireEmblemApp;
 import javafx.event.EventHandler;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -10,12 +11,14 @@ import java.io.IOException;
 public class KeyEventHandler implements EventHandler<KeyEvent> {
     FireEmblemApp app;
     double time;
+    int menuId;
     public KeyEventHandler(FireEmblemApp app){
         this.app = app;
         time = System.nanoTime();
     }
     @Override
     public void handle(KeyEvent e) {
+        menuId = app.getMenuId();
         KeyCode c = e.getCode();
         if (System.nanoTime() - time<30000000){
             time = System.nanoTime();
@@ -25,13 +28,28 @@ public class KeyEventHandler implements EventHandler<KeyEvent> {
         switch (c){
             case KeyCode.UP, KeyCode.DOWN,KeyCode.LEFT,KeyCode.RIGHT:
                 try {
-                    app.moveCursor(c);
+                    ImageView menu;
+                    switch (menuId) {
+                        case 2:
+                            menu = app.getActiveMenu(2);
+                            app.moveMenuPointer(c,menu.getTranslateY(),menu.getTranslateY()+menu.getFitHeight(),(int)(menu.getFitHeight()/3-25)/16);
+                            break;
+                        case 10:
+                            menu = app.getActiveMenu(4);
+                            app.moveMenuPointer(c,menu.getTranslateY(),menu.getTranslateY()+menu.getImage().getHeight()/2,(int)(menu.getImage().getHeight()/6-25)/16);
+                        default:
+                            app.moveCursor(c);
+                    }
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
                 break;
             case KeyCode.ENTER:
-                app.enter();
+                try {
+                    app.enter();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
                 break;
             case KeyCode.B:
                 try {
@@ -41,7 +59,6 @@ public class KeyEventHandler implements EventHandler<KeyEvent> {
                 }
                 break;
             case KeyCode.A:
-                System.out.println("a");
                 app.revertToGameScene();
                 break;
         }

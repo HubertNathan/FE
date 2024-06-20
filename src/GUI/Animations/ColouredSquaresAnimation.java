@@ -15,7 +15,8 @@ import java.util.HashMap;
 public class ColouredSquaresAnimation {
     Board board;
     Pane animationPane;
-    ParallelTransition parallelTransition;;
+    ParallelTransition parallelTransition;
+    double width, height;
     final HashMap<Integer, Image> colouredSquares = new HashMap<>(){{
         for (int i = 1; i < 33; i++) {
             put(i, new Image(getClass().getResource("ColorSquares/" + i + ".png").toExternalForm(), 96, 96, false, false));
@@ -28,8 +29,15 @@ public class ColouredSquaresAnimation {
         this.board = board;
         this.animationPane = animationPane;
     }
+    public void play(){
+        play(width,height);
+    }
     public void play(double width, double height){
-        board.squareAsList().forEach(square -> {
+        this.width = width;
+        this.height = height;
+        boolean b = false;
+        for (Square square : board.squareAsList()) {
+            b = true;
             if (square.isReachable() || square.inRange()) {
                 ImageView imv = new ImageViewer(colouredSquares.get(1),square);
                 imv.setOpacity(.65);
@@ -42,7 +50,7 @@ public class ColouredSquaresAnimation {
                 parallelTransition.getChildren().add(new Transition() {
                     final int offset;
                     {
-                     offset = square.inRange()?16:0;
+                     offset = (square.inRange()&!square.isReachable())?16:0;
                     setCycleDuration(Duration.seconds(1.066666666667));
                     setInterpolator(Interpolator.LINEAR);
                 }
@@ -52,8 +60,8 @@ public class ColouredSquaresAnimation {
                     }
                 });
             }
-        });
-        parallelTransition.play();
+        }
+        if (b) parallelTransition.play();
     }
     public void stop(){
         parallelTransition.stop();

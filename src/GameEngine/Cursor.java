@@ -11,7 +11,8 @@ public class Cursor {
     private int y;
     private final Board board;
     private Unit selectedUnit;
-    ImageView IMV;
+    private ImageView IMV;
+    private String color = "yellow";
     public Cursor(Unit leader, Board board) {
         unit = leader;
 
@@ -48,7 +49,7 @@ public class Cursor {
                 }
                 break;
         }
-        if (unit != null && selectedUnit == null){
+        if (unit != null &&  unit.getColor().equals("blue") && selectedUnit == null){
             unit.setMode(Unit.SELECT);
         }
         if (selectedUnit != null && unit != selectedUnit && board.get(y,x).isReachable()) return selectedUnit.BFS_Algorithm(x+board.getWidth()*y);
@@ -56,7 +57,7 @@ public class Cursor {
     }
 
     public Unit getUnit() {
-        return unit;
+        return board.get(y,x).getUnit();
     }
 
     public void selectUnit(Unit unit){
@@ -67,6 +68,7 @@ public class Cursor {
 
     public void unSelectUnit() {
         if (selectedUnit != null){
+            selectedUnit.unselect(Unit.STANDING);
             selectedUnit = null;
         }
     }
@@ -88,4 +90,14 @@ public class Cursor {
     public int getYValue() {return y;}
 
     public ImageView getIMV() {return IMV;}
+    public String getColor() {
+        return color;
+    }
+    public void setColor(String colour){this.color = colour;}
+    public void setTo(Unit unit, double tileWidth, double tileHeight){
+        x = unit.getXValue();
+        y = unit.getYValue();
+        getIMV().setTranslateX((unit.getXValue()-1./2)*tileWidth);
+        getIMV().setTranslateY((unit.getYValue()-1./2)*tileHeight);
+    }
 }

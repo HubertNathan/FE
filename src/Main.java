@@ -1,10 +1,15 @@
+import GUI.CombatRenderer;
+import GUI.FireEmblemApp;
+import GUI.ReadMapFile;
+import GameEngine.Board;
 import GameEngine.CombatAnimation;
-import Units.Brigand;
+import GameEngine.GameInterface;
+import Units.Bandit;
+import Units.Cavalier;
 import Units.Lyn_Lord;
-import javafx.animation.ParallelTransition;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.image.ImageView;
+import javafx.scene.image.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -16,27 +21,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        Board board = new Board(new ReadMapFile("CH1"));
+        GameInterface gi = new GameInterface(board);
         Lyn_Lord lyn = new Lyn_Lord();
-        Brigand brg = new Brigand("Brigand");
-        ImageView imv = new ImageView();
-        ImageView imv1 = new ImageView();
-        imv.setFitWidth(3*240);
-        imv.setFitHeight(3*160);
-        imv1.setFitWidth(3*240);
-        imv1.setFitHeight(3*160);
-        CombatAnimation animation = new CombatAnimation(lyn,CombatAnimation.MISS);
-        CombatAnimation animation1 = new CombatAnimation(brg,CombatAnimation.DODGE_MELEE,animation.getHitFrame(),animation.getFrameNumber());
+        Cavalier kent = new Cavalier("Kent");
+        Bandit brg = new Bandit("Bandit");
+        ImageView imv1 = new ImageView(), imv2 = new ImageView();
+        CombatRenderer cb = new CombatRenderer(new FireEmblemApp(), stage,board,lyn,brg);
 
-        animation.play(imv1);
-        animation1.play(imv);
-        //System.out.println(animation.getCombatAnimations());
-        //System.out.println(animation.getFrameNumber());
-        System.out.println(animation1.getCombatAnimations());
-        Pane pane = new Pane();
-        pane.getChildren().addAll(imv,imv1);
-        Scene scene = new Scene(pane);
-        scene.setFill(Color.BLACK);
-        stage.setScene(scene);
 
         stage.show();
     }
