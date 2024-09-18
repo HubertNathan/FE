@@ -1,5 +1,6 @@
-package GameEngine;
+package GUI.Combat;
 
+import GameEngine.Board;
 import Items.Weapons.Axe;
 import Items.Weapons.Lance;
 import Items.Weapons.Sword;

@@ -1,9 +1,8 @@
-package GUI;
+package GUI.Combat;
 
 import GUI.Animations.HealthBarTransition;
+import GUI.Battle;
 import GameEngine.Board;
-import GameEngine.CombatAnimation;
-import GameEngine.CombatHandler;
 import GameEngine.TextInterpreter;
 import Units.Unit;
 import javafx.animation.AnimationTimer;
@@ -25,11 +24,10 @@ import javafx.util.Duration;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import static GUI.FireEmblemApp.getResampledImage;
+import static GUI.Battle.getResampledImage;
 
 public class CombatRenderer {
     private final Pane root = new Pane();
@@ -39,10 +37,10 @@ public class CombatRenderer {
     private final Unit attacker, defender;
     private Unit killedUnit;
     private final CombatHandler combatHandler;
-    private final FireEmblemApp FEApp;
+    private final Battle FEApp;
     private final TextInterpreter TI = new TextInterpreter();
     List<Boolean> turn;
-    public CombatRenderer(FireEmblemApp FEApp,Stage window, Board board, Unit attacker, Unit defender) throws IOException {
+    public CombatRenderer(Battle FEApp, Stage window, Board board, Unit attacker, Unit defender) throws IOException {
         this.FEApp = FEApp;
         this.attacker = attacker;
         this.defender = defender;

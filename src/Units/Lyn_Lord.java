@@ -17,6 +17,17 @@ public class Lyn_Lord extends Lord{
         load();
         skin = "/Lyn";
     }
+    public Lyn_Lord(String name) throws IOException {
+        super(name, new Inventory(new Sword(Sword.IronSword){{uses = 39;}}));
+        load();
+        skin = "/Lyn";
+    }
+    public Lyn_Lord(String name, String colour) throws IOException {
+        super(name, new Inventory(new Sword(Sword.IronSword){{uses = 39;}}));
+        load();
+        this.color = colour;
+        skin = "/Lyn";
+    }
     public void load(){
         Sprites = new HashMap<>(){
             {

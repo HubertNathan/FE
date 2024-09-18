@@ -21,6 +21,9 @@ public class MenuPointerAnimation extends Transition {
     public void setX(double x) {
         this.x = x;
     }
+    public double getX(){
+        return x;
+    }
 
     @Override
     protected void interpolate(double t) {

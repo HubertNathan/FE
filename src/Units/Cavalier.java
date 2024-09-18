@@ -56,6 +56,29 @@ public class Cavalier extends Unit {
             default -> "Cavalier";
         };
     }
+    public Cavalier(String name, String colour) throws IOException {
+        super(name, new HashMap<>() {{
+            put("LVL", 1);
+            put("HP", 20);
+            put("Str", 6);
+            put("Mag", 0);
+            put("Skl", 6);
+            put("Spd", 7);
+            put("Lck", 2);
+            put("Def", 5);
+            put("Res", 1);
+            put("Con", 9);
+            put("Mov", 7);
+        }}, new Inventory(new Sword(Sword.IronSword), new Lance(Lance.IronLance)));
+        unitType = "KnightsA";
+        load();
+        skin = switch (name){
+            case "Kent" -> "Kent";
+            case "Sain" -> "Sain";
+            default -> "Cavalier";
+        };
+        this.color = colour;
+    }
     public void load() {
         Sprites = new HashMap<>(){{
         put("blue", new Pair<>(new ResizableImage("file:Resources/Sprites/Cavalier/standingSprites_BLUE.png", 32, 96), new ResizableImage("file:Resources/Sprites/Cavalier/movingSprites_BLUE.png", 32, 480)));

@@ -2,7 +2,7 @@ package Units;
 
 import GUI.Animations.ColouredSquaresAnimation;
 import GUI.Animations.SpriteAnimation;
-import GUI.FireEmblemApp;
+import GUI.Battle;
 import GUI.ResizableImage;
 import GameEngine.Board;
 import GameEngine.Inventory;
@@ -306,9 +306,9 @@ public abstract class Unit extends Pane {
     public ArrayList<Unit> getAdjacentEnemies(){
         ArrayList<Unit> AdjacentUnits = new ArrayList<>();
         if (y>0 && board.get(y-1,x).getUnit() != null && board.get(y-1,x).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y-1,x).getUnit());
-        if (y< board.getHeight() && board.get(y+1,x).getUnit() != null && board.get(y+1,x).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y+1,x).getUnit());
+        if (y< board.getHeight() - 1 && board.get(y+1,x).getUnit() != null && board.get(y+1,x).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y+1,x).getUnit());
         if (x>0&&board.get(y,x-1).getUnit() != null&& board.get(y,x-1).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y,x-1).getUnit());
-        if (x<board.getWidth()&&board.get(y,x+1).getUnit() != null&& board.get(y,x+1).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y,x+1).getUnit());
+        if (x<board.getWidth()-1&&board.get(y,x+1).getUnit() != null&& board.get(y,x+1).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y,x+1).getUnit());
         return AdjacentUnits;
     }
     public void setLeader(boolean isLeader){
@@ -375,7 +375,7 @@ public abstract class Unit extends Pane {
         return spriteAnimation;
     }
     public void die(){
-        FireEmblemApp.getSprites().getChildren().remove(spriteAnimation);
+        Battle.getSprites().getChildren().remove(spriteAnimation);
         spriteAnimation.stop();
         imv.setEffect(new ColorAdjust(){{
             setBrightness(1);

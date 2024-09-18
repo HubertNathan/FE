@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class BattleEffect extends Transition {
+public class CombatEffect extends Transition {
     HashMap<String, List<Integer>> frameNumbers = new HashMap<>(){{
         put("miss", Arrays.asList(17,50));
     }};
@@ -19,7 +19,7 @@ public class BattleEffect extends Transition {
     ImageView imv;
     int lastIndex = -1;
     String effect;
-    public BattleEffect(String effect){
+    public CombatEffect(String effect){
         this.effect = effect;
         battleEffect = new Image("file:Resources/BattleEffects/"+effect+".png");
         setCycleDuration(Duration.seconds((double) frameNumbers.get(effect).getLast()));

@@ -1,6 +1,6 @@
 package EventHandlers;
 
-import GUI.FireEmblemApp;
+import GUI.Battle;
 import javafx.event.EventHandler;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -9,10 +9,10 @@ import javafx.scene.input.KeyEvent;
 import java.io.IOException;
 
 public class KeyEventHandler implements EventHandler<KeyEvent> {
-    FireEmblemApp app;
+    Battle app;
     double time;
     int menuId;
-    public KeyEventHandler(FireEmblemApp app){
+    public KeyEventHandler(Battle app){
         this.app = app;
         time = System.nanoTime();
     }

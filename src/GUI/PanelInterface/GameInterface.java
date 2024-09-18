@@ -1,5 +1,7 @@
-package GameEngine;
+package GUI.PanelInterface;
 
+import GUI.Combat.CombatHandler;
+import GameEngine.Board;
 import Items.Weapons.Weapon;
 import Units.Unit;
 import javafx.animation.Interpolator;
@@ -19,12 +21,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class GameInterface {
-    Image ObjectivesIcon, TerrainIconBackground;
-    Image UpperLeftCorner,UpperBound,UpperRightCorner, LeftBound,Middle,RightBound,LowerLeftCorner,LowerBound,LowerRightCorner;
-    Board board;
-    TextInterpreter TxtI = new TextInterpreter();
-    TextInterpreter terrainTI;
+public class GameInterface extends PanelInterface {
+    private Image ObjectivesIcon, TerrainIconBackground;
+    private final Board board;
 
     class PanelOutTransition extends PanelTransition {
         PanelOutTransition(ImageView imv, int dir, boolean out){
@@ -112,23 +111,14 @@ public class GameInterface {
         }
     }
     public GameInterface(Board board) throws IOException {
+        super();
         this.board = board;
-        terrainTI = new TextInterpreter("terrainNumbers");
         load();
     }
-    private void load() {
+    protected void load() {
         ObjectivesIcon = new Image("file:Resources/MenuSprites/Objectives.png",86*6,40*6,false,false);
         TerrainIconBackground = new Image("file:Resources/MenuSprites/Terrain.png",48*6,54*6,false,false);
-
-        UpperLeftCorner = new Image("file:Resources/MenuSprites/ULC.png",12*6,12*6,false,false);
-        UpperBound = new Image("file:Resources/MenuSprites/UB.png",8*6,12*6,false,false);
-        UpperRightCorner = new Image("file:Resources/MenuSprites/URC.png",13*6,12*6,false,false);
-        RightBound = new Image("file:Resources/MenuSprites/RB.png",13*6,8*6,false,false);
-        LowerRightCorner = new Image("file:Resources/MenuSprites/LoRC.png",13*6,13*6,false,false);
-        LowerBound = new Image("file:Resources/MenuSprites/LoB.png",8*6,13*6,false,false);
-        LowerLeftCorner = new Image("file:Resources/MenuSprites/LoLC.png",12*6,13*6,false,false);
-        LeftBound = new Image("file:Resources/MenuSprites/LB.png",12*6,8*6,false,false);
-        Middle = new Image("file:Resources/MenuSprites/M.png",8*6,8*6,false,false);
+        superLoad();
 
     }
 
@@ -163,41 +153,6 @@ public class GameInterface {
         OI_IMV.setTranslateY(4*3);
 
         return Arrays.asList(TI_IMV,OI_IMV);
-    }
-    public Canvas buildPanel(int width, int height){
-        int wOffset = 0,hOffset = 0;
-        Canvas panel = new Canvas((12+8*width+13)*6,(12+8*height+13)*6);
-        GraphicsContext g = panel.getGraphicsContext2D();
-        g.drawImage(UpperLeftCorner,0,0);
-        wOffset+= 12*6;
-        for (int i = 0; i < width; i++) {
-            g.drawImage(UpperBound,wOffset,hOffset);
-            wOffset += 8*6;
-        }
-        hOffset+=12*6;
-        g.drawImage(UpperRightCorner,wOffset,0);
-        for (int i = 0; i < height; i++) {
-            wOffset = 0;
-            g.drawImage(LeftBound,wOffset,hOffset);
-            wOffset+=12*6;
-            for (int j = 0; j < width; j++) {
-                g.drawImage(Middle,wOffset,hOffset);
-                wOffset+=8*6;
-            }
-            g.drawImage(RightBound,wOffset,hOffset);
-            hOffset+=6*8;
-        }
-        wOffset=0;
-        g.drawImage(LowerLeftCorner,wOffset,hOffset);
-        wOffset+= 12*6;
-        for (int i = 0; i < width; i++) {
-            g.drawImage(LowerBound,wOffset,hOffset);
-            wOffset += 8*6;
-        }
-        g.drawImage(LowerRightCorner,wOffset,hOffset);
-
-        return panel;
-
     }
     public ImageView drawIntermediateMenu(boolean isInRange) throws IOException {
         Canvas canvas = buildPanel(3,isInRange?4:2);

@@ -1,9 +1,8 @@
-package GameEngine;
+package GUI.Combat;
 
-import GUI.CombatRenderer;
+import GUI.Combat.CombatRenderer;
 import Units.Unit;
 import javafx.animation.AnimationTimer;
-import javafx.collections.ObservableList;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -14,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 import static java.util.Collections.max;
-import static java.util.Collections.swap;
 
 public class CombatAnimation extends AnimationTimer {
     private int frameNumber = 0;

@@ -58,7 +58,7 @@ public class Bandit extends Unit{
         };
     }
     public Bandit(String name, String color) throws IOException {
-        super(name, new HashMap<>() {{
+        super((name.isBlank())?"Bandit":name, new HashMap<>() {{
             put("LVL", 1);
             put("HP", 20);
             put("Str", 5);

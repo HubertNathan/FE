@@ -1,6 +1,6 @@
-package GameEngine;
+package GUI.Combat;
 
-import GUI.Animations.BattleEffect;
+import GUI.Animations.CombatEffect;
 import Units.Unit;
 import javafx.animation.Transition;
 import javafx.scene.image.Image;
@@ -18,7 +18,7 @@ public class CombatAnimationOld extends Transition {
     private int hitFrame;
     int lastIndex = -1;
     HashMap<Integer, Image> CombatAnimations = new HashMap<>();
-    BattleEffect battleEffect;
+    CombatEffect combatEffect;
 
     public CombatAnimationOld(Unit unit, String mode) throws FileNotFoundException {
         String resourceDirectory = (unit.getResourceDirectory()+"Battle Animations/"+unit.getSkin()+"/"+unit.getWieldedWeapon().getType()+"/").substring(5);

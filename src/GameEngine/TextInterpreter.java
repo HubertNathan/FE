@@ -11,12 +11,13 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Time;
 import java.util.HashMap;
 
 public class TextInterpreter {
     String mode;
     BufferedImage symbols;
-    ResizableImage symbolsAsImg;
+    ResizableImage symbolsAsImg,numAsImg;
     HashMap<Character,int[]> TxtToIndex;
     HashMap<Character, Image> NumToImg;
 
@@ -36,6 +37,7 @@ public class TextInterpreter {
             put((char)(i),new Image("file:Resources/TerrainNumbers/"+(i-48)+".png",6*8,6*7,false,false));
             }
         }};
+        numAsImg = new ResizableImage("file:Resources/FE7Numbers.png",144,64);
 
         TxtToIndex = new HashMap<>();
         TxtToIndex.put('A', new int[]{153, 49, 6});
@@ -189,6 +191,41 @@ public class TextInterpreter {
             offset+=8*6;
         }
         return canvas.snapshot(new SnapshotParameters(){{setFill(Color.TRANSPARENT);}},null);
+    }
+    public Image convertTime(long time, String colour) throws IOException {
+        int colourOffset = switch (colour){
+            default -> 1;
+            case "green" -> 10;
+            case "gray" -> 19;
+        };
+        int hour = (int)(time/3600);
+        time = Math.max(time - hour * 3600L,0);
+        int min = (int)(time/60);
+        time = Math.max(time - min * 60L,0);
+        int second = (int)(time);
+        int l = 1 + (hour>9?1:0) + (hour>99?1:0);
+        GraphicsContext g = new Canvas((l+6)*6*9,10*6).getGraphicsContext2D();
+        int xOffset = 0;
+        for (int i = 0; i < l; i++) {
+            int n = (int)((hour%Math.pow(10,l-i))/Math.pow(10,l-1-i));
+            g.drawImage(numAsImg.getSubimage(n*9*6,0,6*9,6*10),xOffset,0);
+            xOffset+=8*6;
+        }
+        g.drawImage(numAsImg.getSubimage(13*9*6,0,6*9,6*10),xOffset,0);
+        xOffset+=8*6;
+        g.drawImage(numAsImg.getSubimage(((min%100)/10*9*6),0,6*9,6*10),xOffset,0);
+        xOffset+=8*6;
+        g.drawImage(numAsImg.getSubimage(((min%10)*9*6),0,6*9,6*10),xOffset,0);
+        xOffset+=8*6;
+        g.drawImage(numAsImg.getSubimage(14*9*6,0,6*9,6*10),xOffset,0);
+        xOffset+=6*8;
+        g.drawImage(numAsImg.getSubimage(((second%100)/10*9*6),3*11*6,6*9,6*8),xOffset,12);
+        xOffset+=8*6;
+        g.drawImage(numAsImg.getSubimage(((second%10)*9*6),3*11*6,6*9,6*8),xOffset,12);
+        xOffset+=8*6;
+
+
+        return g.getCanvas().snapshot(new SnapshotParameters(){{setFill(Color.TRANSPARENT);}},null);
     }
 
 }
