@@ -34,6 +34,7 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FireEmblemApp extends Application {
     private final Pane menuPane = new Pane();
@@ -497,10 +498,21 @@ public class FireEmblemApp extends Application {
                 menuPane.getChildren().add(cursor);
 
                 break;
-
-
         }
-
+    }
+    private void backMenu() throws IOException {
+        switch (menuId){
+            case 20:
+                menuId = 10;
+                break;
+            case 10:
+                menuId = 2;
+                break;
+            default:
+                menuId-=1;
+                break;
+        }
+        loadMenu(menuId);
     }
     private class MenuEventListener implements EventHandler<KeyEvent>{
         @Override
@@ -518,16 +530,23 @@ public class FireEmblemApp extends Application {
                     }
                     break;
                 case 1:
-                    switch (event.getCode()){
-                        case KeyCode.ENTER:
-                            clear(2);
-                            try {
-                                loadMenu(2);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            break;
+                    if (event.getCode() == KeyCode.ENTER) {
+                        clear(2);
+                        try {
+                            loadMenu(2);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
+                    else if (event.getCode() == KeyCode.ESCAPE){
+                        clear(3);
+                        try {
+                            backMenu();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
                     break;
                 case 2:
                     switch (event.getCode()){
@@ -793,6 +812,8 @@ public class FireEmblemApp extends Application {
                     switch (event.getCode()){
                         case KeyCode.RIGHT:
                             switch ((int) cursor.getTranslateX()){
+                                case 179*3:
+                                    break;
                                 case 12*3:
                                     cursor.setTranslateX(cursor.getTranslateX()+9*3);
                                     break;
@@ -819,9 +840,33 @@ public class FireEmblemApp extends Application {
                                     break;
                             }
                             break;
+                        case KeyCode.DOWN:
+                            switch((int) cursor.getTranslateY()){
+                                case 136*3:
+                                    break;
+                                case 73*3 :
+                                    cursor.setTranslateY(cursor.getTranslateY()+15*3);
+                                    break;
+                                default :
+                                    cursor.setTranslateY(cursor.getTranslateY()+16*3);
+                                    break;
+                            }
+                            break;
+                        case KeyCode.UP :
+                            switch ((int) cursor.getTranslateY()){
+                                case 73*3:
+                                    break;
+                                case 88*3:
+                                    cursor.setTranslateY(cursor.getTranslateY()-15*3);
+                                    break;
+                                default :
+                                    cursor.setTranslateY(cursor.getTranslateY()-16*3);
+                                    break;
+                            }
                     }
                     break;
             }
+            System.out.println(cursor.getTranslateY()/3);
 
         }
     }

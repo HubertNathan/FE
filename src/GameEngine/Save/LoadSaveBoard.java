@@ -35,13 +35,11 @@ public class LoadSaveBoard {
             };
             if (unitStats == null) unit = loadUnit(line, colour);
             else unit = loadUnit(line, unitStats);
-            System.out.println(line.length);
             if (line[6].equals("l")) {
                 assert unit != null;
                 unit.setLeader(true);
             }
             board.setUnit(unit,Integer.parseInt(line[4]),Integer.parseInt(line[5]));
-            System.out.println(unit);
         }
     }
 

@@ -99,7 +99,7 @@ public class Cavalier extends Unit {
     }
 
     @Override
-    public String getResourceDirectory() {
+    public String getBaseResourceDirectory() {
         return "file:Resources/Sprites/Cavalier/";
     }
 

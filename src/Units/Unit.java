@@ -12,6 +12,7 @@ import Items.Weapons.Weapon;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
+import javafx.geometry.Pos;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -34,8 +35,9 @@ public abstract class Unit extends Pane {
     protected boolean isSelected = false;
     protected String mode = "standing";
     protected String color = "blue";
-    protected ArrayList<Square> availableMoves;
-    private ArrayList<Square> squaresInRange;
+    protected boolean isEnemy = false;
+    protected ArrayList<Position> availableMoves;
+    protected ArrayList<Position> squaresInRange;
     protected ImageView imv;
     protected Weapon wieldedWeapon;
     protected Inventory inventory;
@@ -66,7 +68,48 @@ public abstract class Unit extends Pane {
         health = HP;
         load();
     }
+    Unit(String name,String colour, Map<String, Integer> stats, Inventory inventory) throws IOException {
+        this.color = colour;
+        if (colour.equals("red")){
+            isEnemy = true;
+        }
+        this.inventory = inventory;
+        wieldedWeapon = inventory.getWeapons().getFirst();
+        LVL = stats.get("LVL");
+        HP = stats.get("HP");
+        Str = stats.get("Str");
+        Mag = stats.get("Mag");
+        Skl = stats.get("Skl");
+        Spd = stats.get("Spd");
+        Lck = stats.get("Lck");
+        Def = stats.get("Def");
+        Res = stats.get("Res");
+        Mov = stats.get("Mov");
+        Con = stats.get("Con");
+        this.name = name;
+        health = HP;
+        load();
+    }
     Unit(String name, Map<String, Integer> stats, Weapon weapon) throws IOException {
+        wieldedWeapon = weapon;
+        LVL = stats.get("LVL");
+        HP = stats.get("HP");
+        Str = stats.get("Str");
+        Mag = stats.get("Mag");
+        Skl = stats.get("Skl");
+        Spd = stats.get("Spd");
+        Lck = stats.get("Lck");
+        Def = stats.get("Def");
+        Res = stats.get("Res");
+        Mov = stats.get("Mov");
+        Con = stats.get("Con");
+        this.name = name;
+        health = HP;
+        load();
+    }
+    Unit(String name, String colour, Map<String, Integer> stats, Weapon weapon) throws IOException {
+        this.color = colour;
+        if (colour.equals("red")) isEnemy = true;
         wieldedWeapon = weapon;
         LVL = stats.get("LVL");
         HP = stats.get("HP");
@@ -199,7 +242,10 @@ public abstract class Unit extends Pane {
         if (moving) return ((animFrame >= 12) ? 1 : 0) + ((animFrame >= 18) ? 1 : 0) + ((animFrame >= 30) ? 1 : 0);
         else return ((animFrame >= 32) ? 1 : 0) + ((animFrame >= 36) ? 1 : 0) - ((animFrame >= 68) ? 1 : 0);
     }
-    public abstract String getResourceDirectory();
+    public String getResourceDirectory(){
+        return getBaseResourceDirectory()+"Battle Animations/"+getSkin()+"/"+getWieldedWeapon().getType();
+    }
+    protected abstract String getBaseResourceDirectory();
     public int animation(int animFrame){
         if (mode.equals("standing")){
             return animation((2*animFrame)%72, false,false);
@@ -210,41 +256,119 @@ public abstract class Unit extends Pane {
         else return animation((2*animFrame)%36,false,true);
     }
 
-    public Pair<ArrayList<Square>,ArrayList<Square>> findMoves (ArrayList<Square> availableMoves, ArrayList<Square> squaresInRange, int mov, int i, int j){
-        if (i+1< board.getHeight()) {
-            updateAvailableMov(availableMoves, squaresInRange, mov, i + 1, j, board.get(i,j));
-        }
-        if (j+1<board.getWidth()) {
-            updateAvailableMov(availableMoves, squaresInRange,mov, i, j + 1, board.get(i,j));
-        }
-        if (i>0) {
+     private static class Dijkstra{
+        private static final int[] moveRow = {-1, 1, 0, 0}, moveCol = {0,0,-1,1};
+        public static Pair<ArrayList<Position>, ArrayList<Position>> findMoves(Board board, int i, int j, int mov, String unitType){
+            int width = board.getWidth();
+            int height = board.getHeight();
 
-            updateAvailableMov(availableMoves, squaresInRange,mov, i-1, j, board.get(i,j));
+            final PriorityQueue<Unit.Node> queue = new PriorityQueue<>(Comparator.comparingInt(a->a.distance));
+            int[][] distances = new int[height][width];
+            for (int[] row : distances) Arrays.fill(row, Integer.MAX_VALUE);
+
+            distances[i][j] = 0;
+            queue.offer(new Unit.Node(j,i,0));
+            ArrayList<Position> availableMoves = new ArrayList<>(), tilesInRange = new ArrayList<>(), occupiedTiles = new ArrayList<>();
+            Unit.Node prev = null;
+
+            while (!queue.isEmpty()){
+                Unit.Node cur = queue.poll();
+                int x = cur.getFirst(), y = cur.getLast(), distance = cur.distance;
+                if (prev != null && board.get(y,x).getUnit() != null) occupiedTiles.add(new Position(x,y));
+
+                if (distance > mov) {
+                    break;
+                }
+
+                availableMoves.add(new Position(x,y));
+
+                for (int k = 0; k < 4; k++) {
+                    int newX = x + moveRow[k], newY = y + moveCol[k];
+                    if (newX >= 0 && newY >= 0 && newX < width && newY < height){
+                        if (board.get(newY,newX).getTerrain().getMovPenalty(unitType) < 0) continue;
+                        int newDistance = distance + board.get(newY,newX).getTerrain().getMovPenalty(unitType);
+                        if (newDistance < distances[newY][newX]){
+                            distances[newY][newX] = newDistance;
+                            queue.offer(new Unit.Node(newX,newY,newDistance));
+                        }
+                    }
+                    
+                }
+                prev = cur;
+            }
+            for (Position pos : occupiedTiles){
+                availableMoves.remove(pos);
+            }
+            findTilesInRange(availableMoves,tilesInRange,new Position(j,i),2,width,height);
+            return new Pair<>(availableMoves,tilesInRange);
         }
-        if (j>0) {
-            updateAvailableMov(availableMoves, squaresInRange,mov, i, j-1, board.get(i,j));
+        private static void findTilesInRange(ArrayList<Position> availableMoves,ArrayList<Position> tilesInRange, Position src, int range, int w, int h){
+            boolean[][] visitedNodes = new boolean[h][w];
+            for (boolean[] row : visitedNodes) Arrays.fill(row,false);
+            visitedNodes[src.getLast()][src.getFirst()] = true;
+            findTilesRecursive(availableMoves,tilesInRange,src,visitedNodes,2,w,h);
         }
-        return new Pair<>(availableMoves,squaresInRange);
+        private static void findTilesRecursive(ArrayList<Position> availableMoves, ArrayList<Position> tilesInRange, Position position,boolean[][] visitedNodes, int range, int w, int h){
+            if (range == 0) return;
+            if (range == 1) System.out.println(position.getFirst()+"    "+position.getLast());
+            int x = position.getFirst(), y = position.getLast();
+            for (int i = 0; i < 4; i++) {
+                int newX = x + moveRow[i];
+                int newY = y + moveCol[i];
+
+                if (newX>=0 && newY>=0 && newX<w && newY<h && !visitedNodes[newY][newX]){
+                    if (range == 1) System.out.println("coucou");
+                    Position nextPos = new Position(newX,newY);
+                    visitedNodes[newY][newX] = true;
+                    if (availableMoves.contains(nextPos)) findTilesRecursive(availableMoves,tilesInRange,nextPos,visitedNodes,range,w,h);
+                    else {
+                        tilesInRange.add(nextPos);
+                        findTilesRecursive(availableMoves,tilesInRange,nextPos,visitedNodes,range-1,w,h);
+                    }
+                }
+            }
+        }
+    }
+    public static class Position {
+        private final short x;
+        private final short y;
+        Position(short x, short y){
+            this.x = x;
+            this.y = y;
+        }
+        public Position(int x, int y){
+            this.x = (short) x;
+            this.y = (short) y;
+        }
+        public short getFirst(){
+            return x;
+        }
+        public short getLast(){
+            return y;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof Position && ((Position) obj).x == this.x && ((Position) obj).y == this.y;
+        }
+
+    }
+    private static class Node extends Position{
+        private int distance;
+        Node(int x, int y, int distance){
+            super(x,y);
+            this.distance = distance;
+        }
+
+        public Node(short x, short y) {
+            super(x,y);
+        }
     }
     public void findMoves (){
-        Pair<ArrayList<Square>,ArrayList<Square>> MOVES = findMoves(new ArrayList<>(),new ArrayList<>(), Mov, y, x);
-        availableMoves = MOVES.getKey();
-        squaresInRange = MOVES.getValue();
-    }
-    private void updateAvailableMov(ArrayList<Square> availableMoves, ArrayList<Square> squaresInRange, int mov, int i, int j, Square lastSquare) {
-        Square square = board.get(i, j);
-        int movPenalty = square.getTerrain().getMovPenalty(unitType);
-        if (movPenalty  < 0) return;
-        int remainingMov = mov -movPenalty;
-        if( remainingMov >= 0 && !availableMoves.contains(square)){
-            squaresInRange.add(square);
-            availableMoves.add(square);
-        } else if (remainingMov + attack_range*movPenalty >=0 && !squaresInRange.contains(square) && !availableMoves.contains(square) && (lastSquare.getUnit() == this || lastSquare.getUnit() == null)){
-            squaresInRange.add(square);
-        }
-        if (remainingMov +attack_range > 0) {
-            findMoves(availableMoves,squaresInRange,remainingMov,i,j);
-        }
+        Pair<ArrayList<Position>,ArrayList<Position>> reachableTiles = Dijkstra.findMoves(board,y,x,Mov,unitType);
+        availableMoves = reachableTiles.getKey();
+        squaresInRange = reachableTiles.getValue();
+
     }
     public Unit select(){
         if (this instanceof Lyn_Lord) mode = Unit.DOWN;
@@ -252,11 +376,11 @@ public abstract class Unit extends Pane {
 
         isSelected = true;
         findMoves();
-        for (Square square : availableMoves) {
-            square.reach(true);
+        for (Position pos : availableMoves) {
+            board.get(pos).reach(true);
         }
-        for (Square square : squaresInRange) {
-            square.range(true);
+        for (Position pos : squaresInRange) {
+            board.get(pos).range(true);
         }
         return this;
     }
@@ -267,10 +391,11 @@ public abstract class Unit extends Pane {
         }
     }
     public void endMove(){
-        for (Square square : availableMoves) {
-            square.reach(false);
+        for (Position pos : availableMoves) {
+            board.get(pos).reach(true);
         }
-        for (Square square : squaresInRange) {
+        for (Position pos : squaresInRange) {
+            Square square = board.get(pos);
             if (distanceTo(square)>attack_range ||(square.getXValue() == this.x && square.getYValue() == this.y))  {
                 square.range(false);
             } else if (square.getUnit() == null || (square.getUnit() != null && !square.getUnit().getColor().equals("red"))) {
@@ -369,7 +494,7 @@ public abstract class Unit extends Pane {
 
         }
     }
-    public ArrayList<Square> getAvailableMoves(){return availableMoves;}
+    public ArrayList<Position> getAvailableMoves(){return availableMoves;}
     public Animation getSpriteAnimation(){
         spriteAnimation = new SpriteAnimation(this, imv){{setCycleCount(INDEFINITE);}};
         return spriteAnimation;
@@ -399,12 +524,12 @@ public abstract class Unit extends Pane {
     }
     public ArrayList<Integer> BFS_Algorithm(int end){
         int start = y* board.getWidth()+x;
-        Queue<Node> queue = new LinkedList<>();
+        Queue<GameEngine.Node> queue = new LinkedList<>();
         boolean[] nodes = new boolean[board.getHeight()*board.getWidth()];
-        queue.add(new Node(board,start/board.getWidth(), start%board.getWidth()));
+        queue.add(new GameEngine.Node(board,start/board.getWidth(), start%board.getWidth()));
         nodes[start] = true;
-        Node n = new Node(board,board.getHeight(),board.getWidth());
-        Node node;
+        GameEngine.Node n = new GameEngine.Node(board,board.getHeight(),board.getWidth());
+        GameEngine.Node node;
         while (!queue.isEmpty()){
             n = queue.poll();
             int i = n.getRow();
@@ -412,7 +537,7 @@ public abstract class Unit extends Pane {
             if (i>0){
                 if (board.get(i-1,j).getTerrain().getMovPenalty(unitType)>=0 && !nodes[(i-1)* board.getWidth()+j] && availableMoves.contains(board.get(i-1,j))){
                     nodes[(i-1)* board.getWidth()+j] = true;
-                    node = new Node(board,i-1,j);
+                    node = new GameEngine.Node(board,i-1,j);
                     node.setParent(n);
                     queue.add(node);
                 }
@@ -420,7 +545,7 @@ public abstract class Unit extends Pane {
             if (j>0){
                 if (board.get(i,j-1).getTerrain().getMovPenalty(unitType)>=0 && !nodes[i* board.getWidth()+j-1] && availableMoves.contains(board.get(i,j-1))){
                     nodes[i* board.getWidth()+j] = true;
-                    node = new Node(board,i,j-1);
+                    node = new GameEngine.Node(board,i,j-1);
                     node.setParent(n);
                     queue.add(node);
                 }
@@ -428,7 +553,7 @@ public abstract class Unit extends Pane {
             if (i+1<board.getHeight()){
                 if (board.get(i+1,j).getTerrain().getMovPenalty(unitType)>=0 && !nodes[(i+1)* board.getWidth()+j] && availableMoves.contains(board.get(i+1,j))){
                     nodes[(i+1)* board.getWidth()+j] = true;
-                    node = new Node(board,i+1,j);
+                    node = new GameEngine.Node(board,i+1,j);
                     node.setParent(n);
                     queue.add(node);
                 }
@@ -436,7 +561,7 @@ public abstract class Unit extends Pane {
             if (j+1<board.getWidth()){
                 if (board.get(i,j+1).getTerrain().getMovPenalty(unitType)>=0 && !nodes[i* board.getWidth()+j+1] && availableMoves.contains(board.get(i,j+1))){
                     nodes[i* board.getWidth()+j+1] = true;
-                    node = new Node(board,i,j+1);
+                    node = new GameEngine.Node(board,i,j+1);
                     node.setParent(n);
                     queue.add(node);
                 }

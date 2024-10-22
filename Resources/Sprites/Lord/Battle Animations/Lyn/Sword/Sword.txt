@@ -1,72 +1,72 @@
 *Melee Attack*
-1-Sword_000.png
-3-Sword_001.png
-4-Sword_002.png
+1-000
+3-001
+4-002
 C43                               #Play weapon stance SFE (Clicking noise)
-18-Sword_003.png
+18-003
 C23                               #Play shorter sword swinging SFE
-2-Sword_004.png
-2-Sword_005.png
+2-004
+2-005.png
 C1A				  #hit
 C20				  #Play hit SFE (sounds like Knight Lord with Durandal's hit)
-1-Sword_005.png                          
-2-Sword_006.png
-5-Sword_007.png
-3-Sword_008.png
-2-Sword_009.png
-1-Sword_010.png
+1-005                      
+2-006
+5-007
+3-008
+2-009
+1-010
 C01                               #NOP
 C23                               #Play shorter sword swinging SFE
-2-Sword_011.png
-2-Sword_012.png
-2-Sword_013.png
+2-011
+2-012
+2-013
 C34                               #Play heavy stepping SFE
-4-Sword_014.png
-5-Sword_015.png
-3-Sword_016.png
-3-Sword_017.png
-4-Sword_018.png
-4-Sword_019.png
-4-Sword_020.png
-4-Sword_021.png
-3-Sword_022.png
+4-014
+5-015
+3-016
+3-017
+4-018
+4-019
+4-020
+4-021
+3-022
 C37                               #Play sword clicking SFE
-3-Sword_023.png
-1-Sword_024.png
+3-023
+1-024
 C06                               #Begin opponent's turn after hit.next code 0D.
-3-Sword_024.png
-2-Sword_025.png
-1-Sword_001.png
+3-024
+2-025
+1-001
 C0D                               #End of dodge animation. preceeded by 0x06
 ~~~
 *Melee Critical*
-1-Sword_000.png
-3-Sword_001.png
+1-000
+3-001
 4-Sword_002.png
 C43                               #Play weapon stance SFE (Clicking noise)
 10-Sword_003.png
 4-Sword_026.png
 C36                               #Play sword unsheathing SFE
-4-Sword_027.png
-3-Sword_028.png
-3-Sword_029.png
-4-Sword_030.png
-1-Sword_031.png
-1-Sword_032.png
-1-Sword_031.png
-1-Sword_033.png
-1-Sword_031.png
-1-Sword_034.png
-1-Sword_035.png
-1-Sword_034.png
-1-Sword_035.png
-1-Sword_036.png
-1-Sword_037.png
-1-Sword_036.png
-1-Sword_037.png
-1-Sword_038.png
-1-Sword_039.png
-1-Sword_038.png
+4-027.png
+3-028.png
+3-029.png
+4-030.png
+1-031.png
+1-032.png
+1-031.png
+1-033.png
+1-031.png
+1-034.png
+1-035.png
+1-034.png
+1-035.png
+1-036.png
+1-037.png
+1-036.png
+1-037.png
+1-038.png
+1-039.png
+1-038.png
 1-Sword_039.png
 1-Sword_040.png
 1-Sword_041.png

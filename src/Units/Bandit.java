@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 public class Bandit extends Unit{
     public Bandit(String name, int[] Stats, String colour) throws IOException {
-        super(name,new HashMap<>(){{
+        super(name,colour,new HashMap<>(){{
             put("LVL", Stats[0]);
             put("HP", Stats[1]);
             put("Str", Stats[2]);
@@ -28,7 +28,6 @@ public class Bandit extends Unit{
         );
         unitType = "Bandits";
         load();
-        color = colour;
         skin = switch (name) {
             case "Zugu" -> "Zugu";
             default     -> "Brigand";
@@ -51,14 +50,13 @@ public class Bandit extends Unit{
         }}, new Axe(Axe.IronAxe));
         unitType = "Bandits";
         load();
-        color = "blue";
         skin = switch (name) {
             case "Zugu" -> "Zugu";
             default     -> "Brigand";
         };
     }
-    public Bandit(String name, String color) throws IOException {
-        super((name.isBlank())?"Bandit":name, new HashMap<>() {{
+    public Bandit(String name, String colour) throws IOException {
+        super((name.isBlank())?"Bandit":name, colour, new HashMap<>() {{
             put("LVL", 1);
             put("HP", 20);
             put("Str", 5);
@@ -73,7 +71,6 @@ public class Bandit extends Unit{
         }}, new Axe(Axe.IronAxe));
         unitType = "Bandits";
         load();
-        this.color = color;
         skin = switch (name) {
             case "Zugu" -> "Zugu";
             default     -> "Brigand";
@@ -96,7 +93,7 @@ public class Bandit extends Unit{
     }
 
     @Override
-    public String getResourceDirectory() {
+    public String getBaseResourceDirectory() {
         return "file:Resources/Sprites/Brigand/";
     }
 }

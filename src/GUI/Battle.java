@@ -73,7 +73,7 @@ public class Battle {
         loadBoard(mapFile);
         loadCursor();
         gameInterface = new GameInterface(board);
-        MenuPane.getChildren().addAll(gameInterface.drawMenu(Integer.toString(cursor.getSquare().getTerrain().getDef()), Integer.toString(cursor.getSquare().getTerrain().getAvoid()), cursor.getSquare().getTerrain().toString(), mapFile.getObjectives()));
+        MenuPane.getChildren().addAll(gameInterface.drawMenu(Integer.toString(board.get(cursor.getSquare()).getTerrain().getDef()), Integer.toString(board.get(cursor.getSquare()).getTerrain().getAvoid()), board.get(cursor.getSquare()).getTerrain().toString(), mapFile.getObjectives()));
         window.setTitle("Fire Emblem");
         window.show();
         window.setScene(gameScene);
@@ -479,7 +479,7 @@ public class Battle {
             default:
                 path = null;
         }
-        gameInterface.updateTI(((ImageView) MenuPane.getChildren().getFirst()), cursor.getSquare().getTerrain().defToString(), cursor.getSquare().getTerrain().avoToString(), cursor.getSquare().getTerrain().toString());
+        gameInterface.updateTI(((ImageView) MenuPane.getChildren().getFirst()), board.get(cursor.getSquare()).getTerrain().defToString(), board.get(cursor.getSquare()).getTerrain().avoToString(), board.get(cursor.getSquare()).getTerrain().toString());
 
         if (cursor.getSelectedUnit() != null) {
             if (cursor.getSelectedUnit().getAvailableMoves().contains(cursor.getSquare())) {

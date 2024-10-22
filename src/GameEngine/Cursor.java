@@ -77,8 +77,8 @@ public class Cursor {
         return selectedUnit;
     }
 
-    public Square getSquare(){
-        return board.get(y,x);
+    public Unit.Position getSquare(){
+        return new Unit.Position(x,y);
     }
 
     public void setIMV(ImageView IMV) {

@@ -21,7 +21,6 @@ public class Main extends Application {
         GameInterface gi = new GameInterface(board);
         Lyn_Lord lyn = new Lyn_Lord();
         Cavalier kent = new Cavalier("Kent");
-        Bandit brg = new Bandit("Bandit");
         ImageView imv1 = new ImageView(), imv2 = new ImageView();
         //CombatRenderer cb = new CombatRenderer(new FireEmblemApp(), stage,board,lyn,brg);
 

@@ -31,7 +31,7 @@ public abstract class Lord extends Unit {
     @Override
     public abstract ImageView getPortrait();
     @Override
-    public String getResourceDirectory() {
+    public String getBaseResourceDirectory() {
         return "file:Resources/Sprites/Lord/";
     }
 }

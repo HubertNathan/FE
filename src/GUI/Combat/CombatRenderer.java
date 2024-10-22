@@ -50,7 +50,9 @@ public class CombatRenderer {
     }
 
     private void load(Stage window, Board board) throws IOException {
+        double t = System.nanoTime();
         loadBackground(board);
+        System.out.println("Loading background : "+(System.nanoTime()-t));
         root.getChildren().add(new Pane(){{getChildren().add(new Rectangle(window.getWidth(),window.getHeight()-37){{setFill(Color.color(0,0,0,.2));}});}});
         Scene battleScene = new Scene(root);
         window.setScene(battleScene);
@@ -61,6 +63,7 @@ public class CombatRenderer {
                 FEApp.revertToGameScene();
             }
         });
+        t= System.nanoTime();
         new Thread(()-> {
             try {
                 addUpperUI();
@@ -88,6 +91,7 @@ public class CombatRenderer {
             setDaemon(true);
             start();
         }};
+        System.out.println("Loading Menu : "+(System.nanoTime()-t));
     }
 
     private void loadBackground(Board board) {
@@ -315,12 +319,12 @@ public class CombatRenderer {
 
     private CombatAnimation getCombatAnimation(Unit attacker, Unit defender) throws FileNotFoundException {
         ArrayList<String> battle = new ArrayList<>();
-        String atk = turn.get(1)?CombatAnimation.MELEE_CRITICAL:(turn.getFirst()?CombatAnimation.MELEE_ATTACK:CombatAnimation.MISS),
-               def1 = turn.getFirst()?(defender.getHealth() > combatHandler.getCombatStats().get(1)?CombatAnimation.DAMAGE:CombatAnimation.DEATH):CombatAnimation.DODGE_MELEE,
-               ct_atk =  turn.get(3)?CombatAnimation.MELEE_CRITICAL:(turn.get(2)?CombatAnimation.MELEE_ATTACK:CombatAnimation.MISS),
-               def2 = turn.get(2)?(attacker.getHealth() > combatHandler.getCombatStats().get(4)?CombatAnimation.DAMAGE:CombatAnimation.DEATH):CombatAnimation.DODGE_MELEE,
-               atk2 = turn.get(5)?CombatAnimation.MELEE_CRITICAL:(turn.get(4)?CombatAnimation.MELEE_ATTACK:CombatAnimation.MISS),
-               def3 = turn.get(4)?CombatAnimation.DAMAGE:CombatAnimation.DODGE_MELEE;
+        String atk = turn.get(1)? CombatAnimation.MELEE_CRITICAL:(turn.getFirst()? CombatAnimation.MELEE_ATTACK: CombatAnimation.MISS),
+               def1 = turn.getFirst()?(defender.getHealth() > combatHandler.getCombatStats().get(1)? CombatAnimation.DAMAGE: CombatAnimation.DEATH): CombatAnimation.DODGE_MELEE,
+               ct_atk =  turn.get(3)? CombatAnimation.MELEE_CRITICAL:(turn.get(2)? CombatAnimation.MELEE_ATTACK: CombatAnimation.MISS),
+               def2 = turn.get(2)?(attacker.getHealth() > combatHandler.getCombatStats().get(4)? CombatAnimation.DAMAGE: CombatAnimation.DEATH): CombatAnimation.DODGE_MELEE,
+               atk2 = turn.get(5)? CombatAnimation.MELEE_CRITICAL:(turn.get(4)? CombatAnimation.MELEE_ATTACK: CombatAnimation.MISS),
+               def3 = turn.get(4)? CombatAnimation.DAMAGE: CombatAnimation.DODGE_MELEE;
         battle.add(atk);
         battle.add(def1);
         boolean a = defender.getHealth() > combatHandler.getCombatStats().get(1) || !turn.getFirst();
@@ -333,7 +337,10 @@ public class CombatRenderer {
             battle.add(atk2);
             battle.add(def3);
         }
-        return new CombatAnimation(this, attacker,defender,battle);
+        long t = System.nanoTime();
+        CombatAnimation ca = new CombatAnimation(this, attacker,defender,battle);
+        System.out.println("Load Combat : "+(System.nanoTime()-t)+" ns");
+        return ca;
     }
 
     public void takeDmg(Unit unit){

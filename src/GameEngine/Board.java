@@ -32,6 +32,9 @@ public class Board{
     public Square get(int i, int j){
         return board[i][j];
     }
+    public Square get(Unit.Position pos) {
+        return this.get(pos.getLast(),pos.getFirst());
+    }
 
     public int getHeight() {
         return height;
