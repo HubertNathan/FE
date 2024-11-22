@@ -1,6 +1,7 @@
 package GameEngine;
 
 import GUI.ReadMapFile;
+import GUI.SpriteSheet;
 import Units.Unit;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -24,7 +25,7 @@ public class Board{
             for (int j = 0; j < width; j++) {
                 String terrain = mapReader.getMap().get(width*i+j);
                 int terrainType = Integer.parseInt(mapReader.getTerrains().get(width*i+j));
-                board[i][j] = new Square(mapReader.getTileSetData().getSubimage(16*(Integer.parseInt(terrain)%32), (Integer.parseInt(terrain)/32)*16,16,16),i,j);
+                board[i][j] = new Square(SpriteSheet.getTile((Integer.parseInt(terrain)%32), (Integer.parseInt(terrain)/32)),i,j);
                 board[i][j].setTerrainType(terrainType);
             }
         }
@@ -76,7 +77,7 @@ public class Board{
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                graphicsContext.drawImage((board[i][j].getOriginalTexture()),j*16,i*16);
+                graphicsContext.drawImage((board[i][j].getOriginaltexture()),j*SpriteSheet.tileSize,i*SpriteSheet.tileSize);
             }
         }
     return canvas;

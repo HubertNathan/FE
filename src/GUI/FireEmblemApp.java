@@ -1,6 +1,8 @@
 package GUI;
 
 import GUI.PanelInterface.MainMenuInterface;
+import GameEngine.Battle.BattleEngine;
+import GameEngine.Battle.GameStateManager;
 import GameEngine.MenuPointer;
 import GameEngine.TextInterpreter;
 import GameEngine.Save.Save;
@@ -51,6 +53,7 @@ public class FireEmblemApp extends Application {
     int month = 1;
     String bloodType = "A";
     String gender = "Male";
+    public static int TILE_SIZE = 16, FACTOR = 3;
 
     public FireEmblemApp() throws IOException {
     }
@@ -64,7 +67,8 @@ public class FireEmblemApp extends Application {
         menuScene.setOnKeyPressed(new MenuEventListener());
         //loadMenu(0);
         window.show();
-        new Battle(window);
+        //new Battle(window);
+        new BattleEngine(window,"1");
     }
     private void loadMenu(int ID) throws IOException {
         menuId = ID;

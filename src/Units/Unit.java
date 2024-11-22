@@ -256,7 +256,7 @@ public abstract class Unit extends Pane {
         else return animation((2*animFrame)%36,false,true);
     }
 
-     private static class Dijkstra{
+     public static class Dijkstra{
         private static final int[] moveRow = {-1, 1, 0, 0}, moveCol = {0,0,-1,1};
         public static Pair<ArrayList<Position>, ArrayList<Position>> findMoves(Board board, int i, int j, int mov, String unitType){
             int width = board.getWidth();
@@ -299,35 +299,119 @@ public abstract class Unit extends Pane {
             for (Position pos : occupiedTiles){
                 availableMoves.remove(pos);
             }
-            findTilesInRange(availableMoves,tilesInRange,new Position(j,i),2,width,height);
+            findTilesInRange(availableMoves,tilesInRange,1,width,height);
             return new Pair<>(availableMoves,tilesInRange);
         }
-        private static void findTilesInRange(ArrayList<Position> availableMoves,ArrayList<Position> tilesInRange, Position src, int range, int w, int h){
-            boolean[][] visitedNodes = new boolean[h][w];
-            for (boolean[] row : visitedNodes) Arrays.fill(row,false);
-            visitedNodes[src.getLast()][src.getFirst()] = true;
-            findTilesRecursive(availableMoves,tilesInRange,src,visitedNodes,2,w,h);
-        }
-        private static void findTilesRecursive(ArrayList<Position> availableMoves, ArrayList<Position> tilesInRange, Position position,boolean[][] visitedNodes, int range, int w, int h){
-            if (range == 0) return;
-            if (range == 1) System.out.println(position.getFirst()+"    "+position.getLast());
-            int x = position.getFirst(), y = position.getLast();
-            for (int i = 0; i < 4; i++) {
-                int newX = x + moveRow[i];
-                int newY = y + moveCol[i];
+        private static void findTilesInRange(ArrayList<Position> availableMoves, ArrayList<Position> tilesInRange, int range, int w, int h){
+            Queue<Position> queue = new LinkedList<>();
 
-                if (newX>=0 && newY>=0 && newX<w && newY<h && !visitedNodes[newY][newX]){
-                    if (range == 1) System.out.println("coucou");
-                    Position nextPos = new Position(newX,newY);
-                    visitedNodes[newY][newX] = true;
-                    if (availableMoves.contains(nextPos)) findTilesRecursive(availableMoves,tilesInRange,nextPos,visitedNodes,range,w,h);
-                    else {
-                        tilesInRange.add(nextPos);
-                        findTilesRecursive(availableMoves,tilesInRange,nextPos,visitedNodes,range-1,w,h);
+            boolean[][] visitedNodes = new boolean[h][w];
+            for (Position position : availableMoves) {
+                queue.offer(position);
+                visitedNodes[position.getLast()][position.getFirst()] = false;
+            }
+            int distance = 0;
+            while (!queue.isEmpty() && distance < range){
+                int levelSize = queue.size();
+                for (int i = 0; i < levelSize; i++) {
+                    Position cur = queue.poll();
+                    assert cur != null;
+                    for (int j = 0; j < 4; j++){
+                        int x = cur.getFirst() + moveRow[j];
+                        int y = cur.getLast() + moveCol[j];
+                        if (x>=0 && y>=0 && x<w && y<h && !visitedNodes[y][x]){
+                            Position next = new Position(x,y);
+                            visitedNodes[y][x] = true;
+
+                            queue.offer(next);
+                            if (!availableMoves.contains(next)) tilesInRange.add(next);
+                        }
                     }
                 }
+                distance++;
+
             }
+
         }
+         public static ArrayList<Position> findPath(Position start, Position end, Board board, String unitType) {
+             if (start.equals(end)) return null;  // No path if start and end are the same
+
+             final int width = board.getWidth();
+             final int height = board.getHeight();
+
+             // Priority queue for Dijkstra's algorithm (sorted by distance)
+             final PriorityQueue<Unit.Node> queue = new PriorityQueue<>(Comparator.comparingInt(a -> a.distance));
+
+             // Distance array to track shortest distance from start to each position
+             int[][] distances = new int[height][width];
+             for (int[] row : distances) Arrays.fill(row, Integer.MAX_VALUE);
+
+             // Predecessor array to track the predecessor for each position using a 1D index
+             int[] predecessor = new int[width * height];
+             Arrays.fill(predecessor, -1);  // -1 indicates no predecessor (unvisited)
+
+             // Map (x, y) to a single index in 1D array: index = y * width + x
+             int startIndex = start.getLast() * width + start.getFirst();
+             int endIndex = end.getLast() * width + end.getFirst();
+
+             // Initialize distance for the start position
+             distances[start.getLast()][start.getFirst()] = 0;
+             queue.offer(new Unit.Node(start.getFirst(), start.getLast(), 0));
+
+             while (!queue.isEmpty()) {
+                 Unit.Node cur = queue.poll();
+                 int x = cur.getFirst(), y = cur.getLast(), distance = cur.distance;
+
+                 // If we've reached the end node, break the loop
+                 if (cur.getFirst() == end.getFirst() && cur.getLast() == end.getLast()) break;
+
+                 // Explore the 4 neighboring tiles
+                 for (int i = 0; i < 4; i++) {
+                     int newX = x + moveRow[i];
+                     int newY = y + moveCol[i];
+
+                     // Check if the new position is within the grid and is traversable
+                     if (newX >= 0 && newY >= 0 && newX < width && newY < height) {
+                         if (board.get(newY, newX).getTerrain().getMovPenalty(unitType) < 0) continue;  // Skip if unreachable
+
+                         int newDistance = distance + board.get(newY, newX).getTerrain().getMovPenalty(unitType);
+
+                         // Relaxation step: update if a shorter path is found
+                         if (newDistance < distances[newY][newX]) {
+                             distances[newY][newX] = newDistance;
+                             queue.offer(new Unit.Node(newX, newY, newDistance));
+
+                             // Store the predecessor using 1D indexing
+                             int newIndex = newY * width + newX;
+                             predecessor[newIndex] = y * width + x;  // Store where we came from
+                         }
+                     }
+                 }
+             }
+
+             // Now we backtrack from the end node to start to build the path
+             ArrayList<Position> path = new ArrayList<>();
+             int step = endIndex;
+
+             // If the end node has no predecessor, that means no path was found
+             if (predecessor[endIndex] == -1) return null;
+
+             // Backtrack from end to start
+             while (step != startIndex) {
+                 int stepX = step % width;  // Convert 1D index back to 2D coordinates
+                 int stepY = step / width;
+                 path.add(new Position(stepX, stepY));
+                 step = predecessor[step];  // Move to the predecessor node
+             }
+
+             // Add the start node
+             path.add(start);
+
+             // Reverse the path since we added it from end to start
+             Collections.reverse(path);
+
+             return path;
+         }
     }
     public static class Position {
         private final short x;
@@ -352,6 +436,10 @@ public abstract class Unit extends Pane {
             return obj instanceof Position && ((Position) obj).x == this.x && ((Position) obj).y == this.y;
         }
 
+        @Override
+        public String toString() {
+            return "{ "+x+" ; "+y+" }";
+        }
     }
     private static class Node extends Position{
         private int distance;
@@ -425,6 +513,9 @@ public abstract class Unit extends Pane {
     public int getYValue(){
         return y;
     }
+    public Position getPosition(){
+        return new Position(x,y);
+    }
     public Transition getMoveTransition(){
         return moveTransition;
     }
@@ -449,16 +540,12 @@ public abstract class Unit extends Pane {
         this.mode = mode;
     }
 
-    public void makeMove(int row, int col, double width, double height,ColouredSquaresAnimation c) {
-        if (!(row == x && col == y) && availableMoves.contains(board.get(row,col))) {
+    public void makeMove(int row, int col, double width, double height, ArrayList<Position> path) {
+        if (!(row == x && col == y) && availableMoves.contains(new Position(col,row))) {
             board.removeUnit(this,y,x);
             Unit unit = this;
             moveTransition = new Transition() {
-                private final ArrayList<Integer> path = BFS_Algorithm(row*board.getWidth()+col);
-                private final ArrayList<List<Integer>> vertices =  new ArrayList<>(){{
-                    path.forEach(v -> add(Arrays.asList(v%board.getWidth(), v/board.getWidth())));
-                }};
-                private final int len = vertices.size() - 1;
+                private final int len = path.size() - 1;
                 double time;
                 {
                     setCycleDuration(Duration.seconds((double) len/8));
@@ -473,8 +560,8 @@ public abstract class Unit extends Pane {
                         int index = Math.min((int) (k * len), len - 1);
                         double t = k * len - index;
 
-                        int deltaX = vertices.get(index + 1).getFirst() - vertices.get(index).getFirst();
-                        int deltaY = vertices.get(index + 1).getLast() - vertices.get(index).getLast();
+                        int deltaX = path.get(index + 1).getFirst() - path.get(index).getFirst();
+                        int deltaY = path.get(index + 1).getLast() - path.get(index).getLast();
                         if (deltaX>0){
                             unit.setMode(RIGHT);
                         } else if (deltaX<0) {
@@ -484,8 +571,8 @@ public abstract class Unit extends Pane {
                         } else if (deltaY<0) {
                             unit.setMode(UP);
                         }
-                        imv.setTranslateX((vertices.get(index).getFirst() + t * deltaX) * width - width / 2);
-                        imv.setTranslateY((vertices.get(index).getLast() + t * deltaY) * height - height);
+                        imv.setTranslateX((path.get(index).getFirst() + t * deltaX) * width - width / 2);
+                        imv.setTranslateY((path.get(index).getLast() + t * deltaY) * height - height);
                     }
 
                 }
@@ -495,6 +582,12 @@ public abstract class Unit extends Pane {
         }
     }
     public ArrayList<Position> getAvailableMoves(){return availableMoves;}
+
+    public String getUnitType() {
+        return unitType;
+    }
+
+
     public Animation getSpriteAnimation(){
         spriteAnimation = new SpriteAnimation(this, imv){{setCycleCount(INDEFINITE);}};
         return spriteAnimation;

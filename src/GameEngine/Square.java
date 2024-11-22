@@ -3,6 +3,7 @@ package GameEngine;
 import GUI.ResizableImage;
 import Terrains.*;
 import Units.Unit;
+import javafx.scene.image.Image;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +46,7 @@ public class Square {
     int x;
     int y;
     ResizableImage originalTexture;
+    Image originaltexture;
     private Terrain terrain = new VoidTile();
     private Unit unit = null;
     private boolean isReachable = false;
@@ -53,6 +55,11 @@ public class Square {
 
     public Square(ResizableImage image,int i, int j){
         this.originalTexture = image;
+        x = j;
+        y = i;
+    }
+    public Square(Image image, int i, int j){
+        this.originaltexture = image;
         x = j;
         y = i;
     }
@@ -110,6 +117,11 @@ public class Square {
     public ResizableImage getOriginalTexture(){
         return originalTexture;
     }
+
+    public Image getOriginaltexture() {
+        return originaltexture;
+    }
+
     public Terrain getTerrain(){
         return terrain;
     }

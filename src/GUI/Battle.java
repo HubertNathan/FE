@@ -43,7 +43,7 @@ public class Battle {
     private final MenuPointer menuPointer = new MenuPointer();
     private Cursor cursor;
     double tileWidth = 48, tileHeight = 48;
-    ArrayList<Integer> currentPath;
+    ArrayList<Unit.Position> currentPath;
     Transition CursorAnimation;
     int menuId = 0;
     private static final ParallelTransition sprites = new ParallelTransition();
@@ -363,9 +363,9 @@ public class Battle {
     }
 
     @SuppressWarnings("IntegerDivisionInFloatingPointContext")
-    private void displayPath(ArrayList<Integer> path) {
-        int firstDir = path.get(1) - path.getFirst();
-        int lastDir = path.getLast() - path.get(path.size() - 2);
+    private void displayPath(ArrayList<Unit.Position> path) {
+        int firstDir = path.get(1).getFirst() - path.getFirst().getFirst() + (path.get(1).getLast() - path.getFirst().getLast())*board.getWidth();
+        int lastDir = path.getLast().getFirst() - path.get(path.size() - 2).getFirst() + (path.getLast().getLast() - path.get(path.size() - 2).getLast())*board.getWidth();
         ImageView imv1;
         ImageView imv2;
         if (firstDir == 1) imv1 = new ImageView(arrows.get("04"));
@@ -382,40 +382,38 @@ public class Battle {
         imv1.setFitWidth(tileWidth);
         imv2.setFitHeight(tileHeight);
         imv2.setFitWidth(tileWidth);
-        imv1.setTranslateX(path.getFirst() % board.getWidth() * tileWidth);
-        imv1.setTranslateY(path.getFirst() / board.getWidth() * tileHeight);
-        imv2.setTranslateX(path.getLast() % board.getWidth() * tileWidth);
-        imv2.setTranslateY(path.getLast() / board.getWidth() * tileHeight);
+        imv1.setTranslateX(path.getFirst().getFirst() * tileWidth);
+        imv1.setTranslateY(path.getFirst().getLast() * tileHeight);
+        imv2.setTranslateX(path.getLast().getFirst() * tileWidth);
+        imv2.setTranslateY(path.getLast().getLast() * tileHeight);
         arrowPane.getChildren().addAll(imv1, imv2);
 
-
         for (int i = 1; i < path.size() - 1; i++) {
-            int node = path.get(i);
-            int previousNode = path.get(i - 1);
-            int nextNode = path.get(i + 1);
+            Unit.Position node = path.get(i);
+            Unit.Position previousNode = path.get(i - 1);
+            Unit.Position nextNode = path.get(i + 1);
             ImageView imv = new ImageView();
 
             String trajectory = getTrajectory(node, previousNode, nextNode);
             imv.setImage(arrows.get(trajectory));
             imv.setFitHeight(tileHeight);
             imv.setFitWidth(tileWidth);
-            imv.setTranslateX(path.get(i) % board.getWidth() * tileWidth);
-            imv.setTranslateY(path.get(i) / board.getWidth() * tileHeight);
+            imv.setTranslateX(path.get(i).getFirst() * tileWidth);
+            imv.setTranslateY(path.get(i).getLast() * tileHeight);
             arrowPane.getChildren().add(imv);
 
         }
     }
 
-    private String getTrajectory(int node, int previousNode, int nextNode) {
+    private String getTrajectory(Unit.Position node, Unit.Position previousNode, Unit.Position nextNode) {
         String trajectory = "";
-
-        int previousDir = node - previousNode;
+        int previousDir = node.getFirst() - previousNode.getFirst() + (node.getLast() - previousNode.getLast())* board.getWidth();
         if (previousDir == 1) trajectory += "2";
         else if ((previousDir == -1)) trajectory += "4";
         else if ((previousDir == board.getWidth())) trajectory += "1";
         else trajectory += "3";
 
-        int nextDir = nextNode - node;
+        int nextDir = nextNode.getFirst() - node.getFirst() +(nextNode.getLast() - node.getLast())*board.getWidth();
         if (nextDir == 1) trajectory += "4";
         else if ((nextDir == -1)) trajectory += "2";
         else if ((nextDir == board.getWidth())) trajectory += "3";
@@ -434,25 +432,25 @@ public class Battle {
     }
 
     public void moveCursor(KeyCode c) throws IOException {
-        ArrayList<Integer> path;
+        ArrayList<Unit.Position> path;
         arrowPane.getChildren().clear();
         switch (c) {
             case KeyCode.UP:
-                path = cursor.moveCursor("up");
+                cursor.moveCursor("up");
                 cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight / 2 - tileHeight / 16);
                 if (cursor.getXValue() > board.getWidth() / 2 && cursor.getYValue() == board.getHeight() / 2 - 1 && menuId==0) {
                     gameInterface.animate((ImageView) MenuPane.getChildren().getLast(), 2, true);
                 }
                 break;
             case KeyCode.DOWN:
-                path = cursor.moveCursor("down");
+                cursor.moveCursor("down");
                 cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight / 2 - tileHeight / 16);
                 if (cursor.getXValue() > board.getWidth() / 2 && cursor.getYValue() == board.getHeight() / 2 && menuId==0) {
                     gameInterface.animate((ImageView) MenuPane.getChildren().getLast(), 2, false);
                 }
                 break;
             case KeyCode.LEFT:
-                path = cursor.moveCursor("left");
+                cursor.moveCursor("left");
                 cursor.getIMV().setTranslateX(cursor.getXValue() * tileWidth - tileWidth / 2);
                 if (cursor.getXValue() == board.getWidth() / 2 && menuId==0) {
                     gameInterface.animate(new HashMap<>() {{
@@ -464,7 +462,7 @@ public class Battle {
                 }
                 break;
             case KeyCode.RIGHT:
-                path = cursor.moveCursor("right");
+                cursor.moveCursor("right");
                 cursor.getIMV().setTranslateX(cursor.getXValue() * tileWidth - tileWidth / 2);
                 //if (board.getWidth()-cursor.getXValue()<8) {
                 if (cursor.getXValue() == board.getWidth() / 2 + 1 && menuId==0) {
@@ -476,14 +474,12 @@ public class Battle {
                     }});
                 }
                 break;
-            default:
-                path = null;
         }
         gameInterface.updateTI(((ImageView) MenuPane.getChildren().getFirst()), board.get(cursor.getSquare()).getTerrain().defToString(), board.get(cursor.getSquare()).getTerrain().avoToString(), board.get(cursor.getSquare()).getTerrain().toString());
-
+        path = null;
         if (cursor.getSelectedUnit() != null) {
             if (cursor.getSelectedUnit().getAvailableMoves().contains(cursor.getSquare())) {
-                currentPath = cursor.getSelectedUnit().BFS_Algorithm(cursor.getYValue() * board.getWidth() + cursor.getXValue());
+                path = Unit.Dijkstra.findPath(cursor.getSelectedUnit().getPosition(),cursor.getSquare(),board,cursor.getSelectedUnit().getUnitType());
             }
         }
         if (cursor.getIMV().getImage().getUrl().equals("file:src/GUI/CursorSprites/Cursor4.png"))
@@ -492,7 +488,8 @@ public class Battle {
             cursor.getIMV().setImage(new Image("file:src/GUI/CursorSprites/Cursor4.png", 192, 192, false, false));
             cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight + tileHeight / 8);
         } else cursor.getIMV().setTranslateY(cursor.getYValue() * tileHeight - tileHeight / 2 - tileHeight / 16);
-        if (path != null) {
+        if (path != null && path.size()>1) {
+            currentPath = path;
             displayPath(path);
         }
 
@@ -535,7 +532,7 @@ public class Battle {
                 cursor.getIMV().setVisible(false);
                 Unit movingUnit = cursor.getSelectedUnit();
                 int row = cursor.getYValue(), col = cursor.getXValue();
-                movingUnit.makeMove(row, col, tileWidth, tileHeight, colouredSquaresAnimation);
+                movingUnit.makeMove(row, col, tileWidth, tileHeight, currentPath);
                 movingUnit.getMoveTransition().setOnFinished(event -> {
                     ImageView intermediateMenu;
                     board.setUnit(movingUnit, row, col);
