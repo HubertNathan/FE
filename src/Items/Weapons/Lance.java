@@ -1,6 +1,6 @@
 package Items.Weapons;
 
-import GUI.ResizableImage;
+import gui.ResizableImage;
 
 import java.io.IOException;
 import java.util.List;

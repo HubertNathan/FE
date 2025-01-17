@@ -1,0 +1,187 @@
+*Melee Attack*
+1-000
+C1C                               #Play light horse stepping SFE; pitch decreases
+20-001
+3-002
+C04                               #Prepare HP depletion routine; needed to animate return to standing frame after hit; Magic only.
+1-002
+C1A                               #Normal hit
+C24                               #Play sword slashing air SFE
+C21                               #Play hit SFE (sounds like Knight Lord with sword's hit)
+20-003
+C01                               #NOP
+C22                               #Play short sword swinging SFE
+2-004
+2-005
+5-006
+C1E                               #Similar to 0x1D; a bit louder
+3-007
+13-008
+3-009
+3-010
+1-011
+1-012
+20-013
+C1D                               #Play light horse stepping SFE; pitch increases
+7-014
+3-015
+7-016
+C1D                               #Play light horse stepping SFE; pitch increases
+C06                               #Begin opponent's turn after hit.next code 0D.
+3-016
+3-017
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Melee Critical*
+1-000
+1-018
+2-019
+10-020
+C38                               #Play heavy spear spinning SFE
+3-021
+3-022
+3-023
+C38                               #Play heavy spear spinning SFE
+3-024
+3-025
+3-026
+C22                               #Play short sword swinging SFE
+3-027
+3-028
+4-029
+10-030
+C23                               #Play shorter sword swinging SFE
+3-031
+3-000
+C1C                               #Play light horse stepping SFE; pitch decreases
+20-001
+3-002
+C04                               #Prepare HP depletion routine; needed to animate return to standing frame after hit; Magic only.
+1-002
+C0C                               #Critical hit
+C24                               #Play sword slashing air SFE
+C21                               #Play hit SFE (sounds like Knight Lord with sword's hit)
+20-003
+C01                               #NOP
+C22                               #Play short sword swinging SFE
+2-004
+2-005
+5-006
+C1E                               #Similar to 0x1D; a bit louder
+3-007
+13-008
+3-009
+3-010
+1-011
+1-012
+20-013
+C1D                               #Play light horse stepping SFE; pitch increases
+7-014
+3-015
+7-016
+C1D                               #Play light horse stepping SFE; pitch increases
+C06                               #Begin opponent's turn after hit.next code 0D.
+3-016
+3-017
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Ranged Attack*
+1-000
+3-032
+8-033
+6-034
+13-035
+C25                               #Play wing flap SFE
+C05                               #Call spell associated with equipped weapon
+3-036
+20-037
+C01                               #NOP
+C06                               #Begin opponent's turn after hit.next code 0D.
+3-038
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Ranged Critical*
+1-000
+1-018
+2-019
+10-020
+C38                               #Play heavy spear spinning SFE
+3-021
+3-022
+3-023
+C38                               #Play heavy spear spinning SFE
+3-024
+3-025
+3-026
+C22                               #Play short sword swinging SFE
+3-027
+3-028
+4-029
+10-030
+C23                               #Play shorter sword swinging SFE
+3-031
+3-032
+8-033
+6-034
+13-035
+C25                               #Play wing flap SFE
+C05                               #Call spell associated with equipped weapon
+3-036
+20-037
+C01                               #NOP
+C06                               #Begin opponent's turn after hit.next code 0D.
+3-038
+//C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Dodge Melee*
+C02                               #Start of dodge
+C0E                               #Start of dodging frames (should go after standing frame and before dodging animation)
+3-039
+20-040
+C01                               #NOP
+3-039
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Dodge Ranged*
+C02                               #Start of dodge
+C0E                               #Start of dodging frames (should go after standing frame and before dodging animation)
+3-039
+20-040
+C01                               #NOP
+3-039
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Attack Missed*
+1-000
+C1C                               #Play light horse stepping SFE; pitch decreases
+20-001
+3-002
+C04                               #Prepare HP depletion routine; needed to animate return to standing frame after hit; Magic only.
+1-002
+C1A                               #Normal hit
+C24                               #Play sword slashing air SFE
+C21                               #Play hit SFE (sounds like Knight Lord with sword's hit)
+20-003
+C01                               #NOP
+C22                               #Play short sword swinging SFE
+2-004
+2-005
+5-006
+C1E                               #Similar to 0x1D; a bit louder
+3-007
+13-008
+3-009
+3-010
+1-011
+1-012
+20-013
+C1D                               #Play light horse stepping SFE; pitch increases
+7-014
+3-015
+7-016
+C1D                               #Play light horse stepping SFE; pitch increases
+C06                               #Begin opponent's turn after hit.next code 0D.
+3-016
+3-017
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~

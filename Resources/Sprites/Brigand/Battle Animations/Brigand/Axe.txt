@@ -1,0 +1,170 @@
+*Melee Attack*
+C03                               #Start attack animation; need 07 right after this.
+C07                               #Start attack animation; need 03 right before this.
+1-000
+5-001
+C41                               #Play Axe rising SFE
+5-002
+C30                               #Show dirt kicking (as from dashing forward) animation
+4-003
+1-004
+1-005
+1-006
+2-007
+4-008
+2-009
+1-010
+C04                               #Prepare HP depletion routine; needed to animate return to standing frame after hit
+C42                               #Play Axe falling SFE; long axe swinging SFE
+3-011
+C1A                               #Normal hit
+C1F                               #Play hit SFE (sounds like Eliwood with sword's hit)
+C34                               #Play heavy stepping SFE
+4-012
+1-013
+C01                               #NOP
+3-014
+6-015
+2-016
+6-017
+6-018
+6-019
+4-020
+4-021
+3-022
+2-023
+C34                               #Play heavy stepping SFE
+3-000
+C06                               #Begin opponent's turn after hit.next code 0D.
+6-024
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Melee Critical*
+C03                               #Start attack animation; need 07 right after this.
+C07                               #Start attack animation; need 03 right before this.
+1-000
+C33                               #Play battle cry SFE (REALLY stupid)
+2-025
+2-026
+2-025
+2-026
+2-025
+2-026
+2-025
+2-026
+45-025
+5-000
+5-001
+C41                               #Play Axe rising SFE
+5-002
+C30                               #Show dirt kicking (as from dashing forward) animation
+4-003
+1-004
+1-005
+1-006
+2-007
+4-008
+2-009
+1-010
+C04                               #Prepare HP depletion routine; needed to animate return to standing frame after hit
+//C42                               #Play Axe falling SFE; long axe swinging SFE
+3-011
+C0A                               #Critical hit
+C1F                               #Play hit SFE (sounds like Eliwood with sword's hit)
+C34                               #Play heavy stepping SFE
+4-012
+1-013
+C01                               #NOP
+3-014
+6-015
+2-016
+6-017
+6-018
+6-019
+4-020
+4-021
+3-022
+2-023
+C34                               #Play heavy stepping SFE
+3-000
+C06                               #Begin opponent's turn after hit.next code 0D.
+6-024
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Ranged Attack* 
+1-000
+~~~
+*Ranged Critical*
+1-000
+~~~
+*Dodge Melee*
+C02                               #Start of dodge
+C0E                               #Start of dodging frames (should go after standing frame and before dodging animation)
+3-027
+1-028
+C01                               #NOP
+3-027
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Dodge Ranged*
+C02                               #Start of dodge
+1-000
+C0E                               #Start of dodging frames (should go after standing frame and before dodging animation)
+3-027
+1-028
+C01                               #NOP
+3- 027
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+/ - Mode 9               #Equiped with Melee Items
+1- 000
+C01                               #NOP
+~~~
+/ - Mode 10               #Standing motions
+1- 000
+C01                               #NOP
+~~~
+/ - Mode 11               #Equiped with Ranged weapon
+1- 000
+C01                               #NOP
+~~~
+*Attack Missed*
+C03                               #Start attack animation; need 07 right after this.
+C07                               #Start attack animation; need 03 right before this.
+1-000
+5-001
+C41                               #Play Axe rising SFE
+5-002
+C30                               #Show dirt kicking (as from dashing forward) animation
+4-003
+1-004
+1-005
+1-006
+2-007
+4-008
+2-009
+1-010
+C04                               #Prepare HP depletion routine; needed to animate return to standing frame after hit
+C42                               #Play Axe falling SFE; long axe swinging SFE
+3-029
+C34                               #Play heavy stepping SFE
+C1B
+2-030
+1-031
+C01                               #NOP
+3-032
+2-016
+6-017
+6-018
+6-019
+4-020
+4-021
+3-022
+2-023
+//C34                               #Play heavy stepping SFE
+3-000
+//C06                               #Begin opponent's turn after hit.next code 0D.
+6-024
+//C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+/// - End of animation

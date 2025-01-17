@@ -1,0 +1,230 @@
+*Melee Attack*
+1-000
+3-001
+4-002
+C43                               #Play weapon stance SFE (Clicking noise)
+18-003
+C23                               #Play shorter sword swinging SFE
+2-004
+2-005
+C1A				  #hit
+C20				  #Play hit SFE (sounds like Knight Lord with Durandal's hit)
+1-005
+2-006
+5-007
+3-008
+2-009
+1-010
+C01                               #NOP
+C23                               #Play shorter sword swinging SFE
+2-011
+2-012
+2-013
+C34                               #Play heavy stepping SFE
+4-014
+5-015
+3-016
+3-017
+4-018
+4-019
+4-020
+4-021
+3-022
+C37                               #Play sword clicking SFE
+3-023
+1-024
+C06                               #Begin opponent's turn after hit.next code 0D.
+3-024
+2-025
+1-001
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Melee Critical*
+1-000
+3-001
+4-002
+C43                               #Play weapon stance SFE (Clicking noise)
+10-003
+4-026
+C36                               #Play sword unsheathing SFE
+4-027
+3-028
+3-029
+4-030
+1-031
+1-032
+1-031
+1-033
+1-031
+1-034
+1-035
+1-034
+1-035
+1-036
+1-037
+1-036
+1-037
+1-038
+1-039
+1-038
+1-039
+1-040
+1-041
+1-040
+1-041
+1-040
+1-042
+1-043
+1-042
+1-043
+1-042
+1-043
+1-042
+1-043
+2-042
+1-043
+1-042
+2-044
+1-045
+1-044
+19-045
+C20                               #Play hit SFE (sounds like Knight Lord with Durandal's hit)
+1-046
+1-047
+1-048
+10-045
+C21                               #Play hit SFE (sounds like Knight Lord with sword's hit)
+1-049
+1-050
+1-051
+10-045
+C04                               #Prepare HP depletion routine; needed to animate return to standing frame after hit
+C09                               #Critical hit
+C20                               #Play hit SFE (sounds like Knight Lord with Durandal's hit)
+1-045
+C01                               #NOP
+1-052
+1-053
+1-054
+1-055
+1-056
+1-057
+1-058
+2-059
+2-015
+3-016
+3-017
+4-018
+4-019
+4-020
+4-021
+3-022
+C37                               #Play sword clicking SFE
+3-023
+1-024
+C06                               #Begin opponent's turn after hit.next code 0D.
+3-024
+2-025
+1-001
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Ranged Attack* 
+1-000
+3-025
+4-024
+3-060
+C05                               #Call spell associated with equipped weapon
+1-061
+C01                               #NOP
+3-060
+C37                               #Play sword clicking SFE
+C06                               #Begin opponent's turn after hit.next code 0D.
+3-024
+3-025
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Ranged Critical*
+1-000
+3-025
+4-024
+3-060
+3-061
+1-062
+3-061
+2-62
+3-061
+1-062
+2-061
+1-062
+C05                               #Call spell associated with equipped weapon
+1-061
+C01                               #NOP
+3-060
+C37                               #Play sword clicking SFE
+C06                               #Begin opponent's turn after hit.next code 0D.
+3-024
+3-025
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Dodge Melee*
+C02                               #Start of dodge
+C0E                               #Start of dodging frames (should go after standing frame and before dodging animation)
+3-064
+1-065
+C01                               #NOP
+3-064
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Dodge Ranged*
+C02                               #Start of dodge
+1-000
+C0E                               #Start of dodging frames (should go after standing frame and before dodging animation)
+3-064
+1-064
+C01                               #NOP
+3-063
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+*Attack Missed*
+C03                               #Start attack animation; need 07 right after this.
+C07                               #Start attack animation; need 03 right before this.
+1-000
+3-001
+4-002
+C43                               #Play weapon stance SFE (Clicking noise)
+18-003
+C23                               #Play shorter sword swinging SFE
+2-004
+2-005
+C1B
+C04                               #Prepare HP depletion routine; needed to animate return to standing frame after hit
+2-006
+5-007
+3-008
+2-009
+1-010
+C01                               #NOP
+C23                               #Play shorter sword swinging SFE
+2-011
+2-012
+2-013
+C34                               #Play heavy stepping SFE
+4-014
+5-015
+3-016
+3-017
+4-018
+4-019
+4-020
+4-021
+3-022
+C37                               #Play sword clicking SFE
+3-023
+1-024
+C06                               #Begin opponent's turn after hit.next code 0D.
+3-024
+2-025
+1-001
+C0D                               #End of dodge animation. preceeded by 0x06
+~~~
+/// - End of animation
