@@ -38,47 +38,46 @@ public class SpriteAnimation extends Transition {
         setCycleDuration(Duration.millis(2400)); // Set animation cycle duration (adjustable)
         setInterpolator(Interpolator.LINEAR); // Smooth frame transition
     }
+    public void switchMode(){
+        imv.setImage(unit.getSprites());
+    }
 
     @Override
     protected void interpolate(double k) {
-        final int index = unit.animation((int) (72 * k));
-        final int index2 = (int) (144 * k);
+        final byte index = unit.animation((int)(72 * k));
+        final short index2 = (short) (144 * k);
+        final short xOffset = switch (unit.getColor()){
+            case "red" -> 32*3;
+            case "green" -> 64*3;
+            case "gray" -> 96*3;
+            default -> 0;
+        };
 
         if (lastIndex != index2) {
             switch (unit.getMode()) {
                 case Unit.RIGHT -> {
-                    imv.setImage(unit.getSprites());
                     imv.setScaleX(-1);
                     offsetY = 0;
                 }
-                case Unit.LEFT -> {
-                    imv.setImage(unit.getSprites());
+                case Unit.LEFT, Unit.STANDING -> {
                     imv.setScaleX(1);
                     offsetY = 0;
                 }
                 case Unit.DOWN -> {
-                    imv.setImage(unit.getSprites());
                     imv.setScaleX(1);
                     offsetY = 4;
                 }
                 case Unit.UP -> {
-                    imv.setImage(unit.getSprites());
                     imv.setScaleX(1);
                     offsetY = 8;
                 }
                 case Unit.SELECT -> {
-                    imv.setImage(unit.getSprites());
                     imv.setScaleX(1);
                     offsetY = 12;
                 }
-                case Unit.STANDING -> {
-                    imv.setImage(unit.getSprites());
-                    imv.setScaleX(1);
-                    offsetY = 0;
-                }
             }
             final int y = index * height + offsetY * height;
-            imv.setViewport(new Rectangle2D(0, y, width, height));
+            imv.setViewport(new Rectangle2D(xOffset, y, (double) width /4, height));
 
             lastIndex = index2;
         }

@@ -1,12 +1,10 @@
 package core.game_engine.game_state;
 
-import core.Coord;
+import core.game_engine.helper_functions.Coord;
 import gui.Animations.ColorTilesAnimation;
-import gui.PanelInterface.GameInterface;
 import core.game_engine.Battle.BattleEngine;
 import core.Cursor;
 import javafx.animation.Transition;
-import units.Unit;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,15 +19,13 @@ import static core.game_engine.Battle.BattleEngine.*;
 public class UnitMoveState implements GameState {
     private final Cursor cursor;
     private GameStateContext context;
-    private final GameInterface gi;
     private ColorTilesAnimation tilesAnimation ;
     private ArrayList<Coord> path = null;
     private final String objectives;
     private boolean moving = false;
 
-    UnitMoveState(Cursor cursor, GameInterface gi, String objectives){
+    UnitMoveState(Cursor cursor, String objectives){
         this.cursor = cursor;
-        this.gi = gi;
         this.objectives = objectives;
         transitionIn();
     };
@@ -68,11 +64,11 @@ public class UnitMoveState implements GameState {
             getAnimationPane().getChildren().clear();
             Transition move = cursor.getSelectedUnit().makeMove(path);
             tilesAnimation.stop();
-            cursor.getIMV().setOpacity(0);
+            cursor.getIMV().setOpacity(1);
             BattleEngine.getBoard().resetReachableSquares();
             move.setOnFinished(e -> {
                 try {
-                    context.setCurrentState(new ActionSelectionState(cursor,gi,objectives));
+                    context.setCurrentState(new ActionSelectionState(cursor,objectives));
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -91,7 +87,8 @@ public class UnitMoveState implements GameState {
         }
         cursor.setTo(cursor.getSelectedUnit());
         cursor.unSelectUnit();
-        context.setCurrentState(new UnitSelectionState(cursor,gi,objectives));
+        context.setCurrentState(new UnitSelectionState(cursor,objectives));
+        cursor.getUnit().getSpriteAnimation().switchMode();
     }
     private void moveUp() {
         cursor.moveUp();

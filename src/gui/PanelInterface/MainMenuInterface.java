@@ -10,12 +10,7 @@ import java.io.IOException;
 
 public class MainMenuInterface extends PanelInterface{
     public MainMenuInterface() throws IOException {
-        superLoad();
-    }
 
-    @Override
-    protected void load() {
-        superLoad();
     }
     public ImageView drawBTPanel(){
         GraphicsContext g = buildPanel(10,0).getGraphicsContext2D();

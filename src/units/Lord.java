@@ -1,6 +1,7 @@
 package units;
 
 import core.Inventory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.IOException;
@@ -11,15 +12,14 @@ public abstract class Lord extends Unit {
         super(
                 name,
                 "blue",
-                new short[] { 1, 16, 4, 0, 7, 9, 5, 2, 0, 5, 5},
+                new byte[] { 1, 16, 4, 0, 7, 9, 5, 2, 0, 5, 5},
                 inventory);
         this.name = name;
         this.unitType = "Foot";
     }
-
-    public void load() throws IOException {
-        //standingSprites = ImageIO.read(new File("/Sprites/Lord/standingSprites"));
-    }
+    public abstract void load() throws IOException;
+    @Override
+    public abstract Image getSprites();
     @Override
     public abstract ImageView getPortrait();
     @Override

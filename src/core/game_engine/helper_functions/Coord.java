@@ -1,20 +1,16 @@
-package core;
+package core.game_engine.helper_functions;
 
 public class Coord {
-    private final short x;
-    private final short y;
-    Coord(short x, short y){
+    private final byte x;
+    private final byte y;
+    public Coord(byte x, byte y){
         this.x = x;
         this.y = y;
     }
-    public Coord(int x, int y){
-        this.x = (short) x;
-        this.y = (short) y;
-    }
-    public short getFirst(){
+    public byte getFirst(){
         return x;
     }
-    public short getLast(){
+    public byte getLast(){
         return y;
     }
     @Override

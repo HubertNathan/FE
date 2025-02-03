@@ -25,8 +25,7 @@ import static gui.FireEmblemApp.TILE_SIZE;
 public class BattleEngine {
     public static int tileSize = TILE_SIZE;
     private static final Pane background = new Pane(), spritePane = new Pane(), overlayPane = new Pane(), animationPane = new Pane(), arrowPane = new Pane();
-    private static Board board = new Board();
-    private GameInterface gi;
+    private final static Board board = new Board();
     public BattleEngine(Stage window, String Chapter) throws IOException {
         Pane root = new Pane();
         Scene mainScene = new Scene(root);
@@ -36,14 +35,12 @@ public class BattleEngine {
         loadBoard(mapFile,mainScene);
     }
     private void loadBoard(ReadMapFile mapFile, Scene scene) throws IOException {
-        board = new Board();
         board.init(mapFile);
-        gi = new GameInterface(board);
         loadBackground();
         new LoadSaveBoard("CH1").loadBoard(board);
         Cursor cursor = new Cursor(overlayPane);
         String obj = mapFile.getObjectives();
-        new InputManager(new GameStateContext(){{setCurrentState(new UnitSelectionState(cursor,gi,obj));}}).addEventHandler(scene);
+        new InputManager(new GameStateContext(){{setCurrentState(new UnitSelectionState(cursor,obj));}}).addEventHandler(scene);
         displayUnits();
     }
     private void loadBackground(){
@@ -54,7 +51,7 @@ public class BattleEngine {
         board.getUnits().forEach(unit -> {
             if (unit != null) {
 
-                ImageView imv = new ImageView(unit.getSprites());
+                ImageView imv = new ImageView(unit.getSprites()){{setSmooth(false);}};
                 imv.setViewport(new Rectangle2D(0, 0, 6 * 32, 6 * 32));
                 unit.setImv(imv);
                 imv.setFitWidth(2*tileSize);
@@ -63,7 +60,7 @@ public class BattleEngine {
                 imv.setTranslateY(unit.getYValue() * tileSize - tileSize);
                 unit.setImv(imv);
                 spritePane.getChildren().add(imv);
-                Animation animation = unit.getSpriteAnimation();
+                Animation animation = unit.startSpriteAnimation();
                 spriteAnimation.getChildren().add(animation);
             }
         });

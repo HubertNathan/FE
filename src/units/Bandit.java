@@ -1,19 +1,19 @@
 package units;
 
 import gui.Animations.Portrait;
-import gui.ResizableImage;
 import Items.Weapons.Axe;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.util.Pair;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 public class Bandit extends Unit{
+    protected static Image standingSprites, movingSprites;
     public Bandit(String name, String colour) throws IOException {
         super(
                 (name.isBlank())?"Bandit":name,
-                colour, new short[] { 1,20,5,0,1,5,0,3,0,5,12},
+                colour,
+                new byte[] { 1,20,5,0,1,5,0,3,0,5,12},
                 new Axe(Axe.IronAxe)
         );
         unitType = "Bandits";
@@ -25,12 +25,8 @@ public class Bandit extends Unit{
     }
     @Override
     public void load(){
-        Sprites = new HashMap<>(){{
-            put("blue", new Pair<>(new ResizableImage("file:Resources/Sprites/Brigand/standingSprites_BLUE.png", 32, 96), new ResizableImage("file:Resources/Sprites/Brigand/movingSprites_BLUE.png", 32, 480)));
-            put("red", new Pair<>(new ResizableImage("file:Resources/Sprites/Brigand/standingSprites_RED.png", 32, 96), new ResizableImage("file:Resources/Sprites/Brigand/movingSprites_RED.png", 32, 480)));
-            put("green", new Pair<>(new ResizableImage("file:Resources/Sprites/Brigand/standingSprites_GREEN.png", 32, 96), new ResizableImage("file:Resources/Sprites/Brigand/movingSprites_GREEN.png", 32, 480)));
-            put("gray", new Pair<>(new ResizableImage("file:Resources/Sprites/Brigand/standingSprites_GRAY.png", 32, 96), new ResizableImage("file:Resources/Sprites/Brigand/movingSprites_GRAY.png", 32, 480)));
-        }};
+        standingSprites = new Image("file:Resources/Sprites/Brigand/standingSprites.png",32*4*3,96*3,false,false);
+        movingSprites = new Image("file:Resources/Sprites/Brigand/movingSprites.png",32*4*3,480*3,false,false);
     }
 
     @Override
@@ -38,7 +34,13 @@ public class Bandit extends Unit{
         if (skin.equals("Zugu") )return Portrait.getPortrait(Portrait.ZUGU);
         return null;
     }
-
+    @Override
+    public Image getSprites() {
+        if (mode.equals(STANDING)){
+            return  standingSprites;
+        }
+        return movingSprites;
+    }
     @Override
     public String getBaseResourceDirectory() {
         return "file:Resources/Sprites/Brigand/";

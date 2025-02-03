@@ -7,59 +7,89 @@ import javafx.scene.image.Image;
 
 import java.io.IOException;
 
+import static core.game_engine.Battle.BattleEngine.tileSize;
+
 public abstract class PanelInterface {
-    protected TextInterpreter TxtI;
-    protected Image UpperLeftCorner,UpperBound,UpperRightCorner, LeftBound,Middle,RightBound,LowerLeftCorner,LowerBound,LowerRightCorner;
+    protected static double scale = tileSize / 16.;
+    protected static final Image UpperLeftCorner = new Image("file:Resources/MenuSprites/ULC.png"),
+    UpperBound = new Image("file:Resources/MenuSprites/UB.png"),
+    UpperRightCorner = new Image("file:Resources/MenuSprites/URC.png"),
+    RightBound = new Image("file:Resources/MenuSprites/RB.png"),
+    LowerRightCorner = new Image("file:Resources/MenuSprites/LoRC.png"),
+    LowerBound = new Image("file:Resources/MenuSprites/LoB.png"),
+    LowerLeftCorner = new Image("file:Resources/MenuSprites/LoLC.png"),
+    LeftBound = new Image("file:Resources/MenuSprites/LB.png"),
+    Middle = new Image("file:Resources/MenuSprites/M.png");
 
-    PanelInterface() throws IOException {
-        TxtI = new TextInterpreter();
-    }
-    protected void superLoad(){
-        UpperLeftCorner = new Image("file:Resources/MenuSprites/ULC.png",12*6,12*6,false,false);
-        UpperBound = new Image("file:Resources/MenuSprites/UB.png",8*6,12*6,false,false);
-        UpperRightCorner = new Image("file:Resources/MenuSprites/URC.png",13*6,12*6,false,false);
-        RightBound = new Image("file:Resources/MenuSprites/RB.png",13*6,8*6,false,false);
-        LowerRightCorner = new Image("file:Resources/MenuSprites/LoRC.png",13*6,13*6,false,false);
-        LowerBound = new Image("file:Resources/MenuSprites/LoB.png",8*6,13*6,false,false);
-        LowerLeftCorner = new Image("file:Resources/MenuSprites/LoLC.png",12*6,13*6,false,false);
-        LeftBound = new Image("file:Resources/MenuSprites/LB.png",12*6,8*6,false,false);
-        Middle = new Image("file:Resources/MenuSprites/M.png",8*6,8*6,false,false);
-    }
-    protected abstract void load();
-
-    protected Canvas buildPanel(int width, int height){
-        int wOffset = 0,hOffset = 0;
-        Canvas panel = new Canvas((12+8*width+13)*6,(12+8*height+13)*6);
-        GraphicsContext g = panel.getGraphicsContext2D();
-        g.drawImage(UpperLeftCorner,0,0);
-        wOffset+= 12*6;
+    protected static Canvas buildPanel(int width, int height){
+        double wOffset = 0,hOffset = 0;
+        GraphicsContext g = new Canvas((12+8*width+13)*scale,(12+8*height+13)*scale).getGraphicsContext2D();
+        g.setImageSmoothing(false);
+        g.drawImage(
+                UpperLeftCorner,
+                0,0,
+                UpperLeftCorner.getWidth()*scale,UpperLeftCorner.getHeight()*scale
+        );
+        wOffset += 12*scale;
         for (int i = 0; i < width; i++) {
-            g.drawImage(UpperBound,wOffset,hOffset);
-            wOffset += 8*6;
+            g.drawImage(
+                    UpperBound,
+                    wOffset,hOffset,
+                    UpperBound.getWidth()*scale,UpperBound.getHeight()*scale
+            );
+            wOffset += 8*scale;
         }
-        hOffset+=12*6;
-        g.drawImage(UpperRightCorner,wOffset,0);
+        g.drawImage(
+                UpperRightCorner,
+                wOffset,hOffset,
+                UpperRightCorner.getWidth()*scale,UpperRightCorner.getHeight()*scale
+        );
+        hOffset += 12*scale;
         for (int i = 0; i < height; i++) {
             wOffset = 0;
-            g.drawImage(LeftBound,wOffset,hOffset);
-            wOffset+=12*6;
+            g.drawImage(
+                    LeftBound,
+                    wOffset,hOffset,
+                    LeftBound.getWidth()*scale,LeftBound.getHeight()*scale
+            );
+            wOffset += 12*scale;
             for (int j = 0; j < width; j++) {
-                g.drawImage(Middle,wOffset,hOffset);
-                wOffset+=8*6;
+                g.drawImage(
+                        Middle,
+                        wOffset,hOffset,
+                        Middle.getWidth()*scale,Middle.getHeight()*scale
+                );
+                wOffset+=8*scale;
             }
-            g.drawImage(RightBound,wOffset,hOffset);
-            hOffset+=6*8;
+            g.drawImage(
+                    RightBound,
+                    wOffset,hOffset,
+                    RightBound.getWidth()*scale,RightBound.getHeight()*scale
+            );
+            hOffset+=8*scale;
         }
         wOffset=0;
-        g.drawImage(LowerLeftCorner,wOffset,hOffset);
-        wOffset+= 12*6;
+        g.drawImage(
+                LowerLeftCorner,
+                wOffset,hOffset,
+                LowerLeftCorner.getWidth()*scale,LowerLeftCorner.getHeight()*scale
+        );
+        wOffset+= 12*scale;
         for (int i = 0; i < width; i++) {
-            g.drawImage(LowerBound,wOffset,hOffset);
-            wOffset += 8*6;
+            g.drawImage(
+                    LowerBound,
+                    wOffset,hOffset,
+                    LowerBound.getWidth()*scale,LowerBound.getHeight()*scale
+            );
+            wOffset += 8*scale;
         }
-        g.drawImage(LowerRightCorner,wOffset,hOffset);
+        g.drawImage(
+                LowerRightCorner,
+                wOffset,hOffset,
+                LowerRightCorner.getWidth()*scale,LowerRightCorner.getHeight()*scale
+                );
 
-        return panel;
+        return g.getCanvas();
 
     }
 }

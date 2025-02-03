@@ -1,6 +1,7 @@
 package core;
 
 import core.game_engine.Battle.BattleEngine;
+import core.game_engine.helper_functions.Coord;
 import core.game_engine.helper_functions.Dijkstra;
 import units.Unit;
 import javafx.animation.Interpolator;
@@ -17,7 +18,7 @@ import static core.game_engine.Battle.BattleEngine.tileSize;
 
 public class Cursor {
     Unit unit;
-    private int x,y;
+    private byte x,y;
     private CursorTransition transition;
     private static final Board board = BattleEngine.getBoard();
     private Unit selectedUnit;
@@ -55,7 +56,10 @@ public class Cursor {
     }
 
     public void moveUp(){
-        if (unit != null && unit.getMode().equals(Unit.SELECT)){unit.setMode(Unit.STANDING);}
+        if (unit != null && unit.getMode().equals(Unit.SELECT)){
+            unit.setMode(Unit.STANDING);
+            unit.getSpriteAnimation().switchMode();
+        }
         if (y > 0){
             y -=1;
             unit = board.get(y,x).getUnit();
@@ -63,7 +67,10 @@ public class Cursor {
 
     }
     public void moveDown(){
-        if (unit != null && unit.getMode().equals(Unit.SELECT)){unit.setMode(Unit.STANDING);}
+        if (unit != null && unit.getMode().equals(Unit.SELECT)){
+            unit.setMode(Unit.STANDING);
+            unit.getSpriteAnimation().switchMode();
+        }
         if (y + 1 < board.getHeight()){
             y +=1;
             unit = board.get(y,x).getUnit();
@@ -71,7 +78,10 @@ public class Cursor {
 
     }
     public void moveLeft(){
-        if (unit != null && unit.getMode().equals(Unit.SELECT)){unit.setMode(Unit.STANDING);}
+        if (unit != null && unit.getMode().equals(Unit.SELECT)){
+            unit.setMode(Unit.STANDING);
+            unit.getSpriteAnimation().switchMode();
+        }
         if (x > 0){
             x -=1;
             unit = board.get(y,x).getUnit();
@@ -79,7 +89,10 @@ public class Cursor {
 
     }
     public void moveRight(){
-        if (unit != null && unit.getMode().equals(Unit.SELECT)){unit.setMode(Unit.STANDING);}
+        if (unit != null && unit.getMode().equals(Unit.SELECT)){
+            unit.setMode(Unit.STANDING);
+            unit.getSpriteAnimation().switchMode();
+        }
         if (x + 1 < board.getWidth()){
             x +=1;
             unit = board.get(y,x).getUnit();
@@ -89,10 +102,10 @@ public class Cursor {
     public void endMove(){
         if (unit != null &&  unit.getColor().equals("blue") && selectedUnit == null){
             unit.setMode(Unit.SELECT);
+            unit.getSpriteAnimation().switchMode();
         }
         IMV.setTranslateX(x * tileSize - tileSize / 2);
-        if (IMV.getImage().getUrl().equals("file:src/gui/CursorSprites/Cursor4.png"))
-            IMV.setImage((transition).getImage());
+        if (IMV.getImage().getUrl().equals("file:src/gui/CursorSprites/Cursor4.png")) IMV.setImage((transition).getImage());
         if (getUnit() != null && getSelectedUnit() == null && getUnit().getColor().equals("blue")) {
             IMV.setImage(new Image("file:src/gui/CursorSprites/Cursor4.png", tileSize*4, tileSize*4, false, false));
             IMV.setTranslateY(y * tileSize - tileSize + tileSize / 8);
@@ -136,9 +149,9 @@ public class Cursor {
         this.IMV = IMV;
     }
 
-    public int getXValue() {return x;}
+    public byte getXValue() {return x;}
 
-    public int getYValue() {return y;}
+    public byte getYValue() {return y;}
 
     public ImageView getIMV() {return IMV;}
     public String getColor() {
@@ -183,12 +196,12 @@ public class Cursor {
 
 
         private int updateAnimation(double animFrame) {
-            return 3 + (animFrame > 1 ? -1 : 0) + (animFrame > 3 ? -1 : 0) + (animFrame > 19 ? 1 : 0) + (animFrame > 21 ? 1 : 0);
+            return (3 + (animFrame > 1 ? -1 : 0) + (animFrame > 3 ? -1 : 0) + (animFrame > 19 ? 1 : 0) + (animFrame > 21 ? 1 : 0));
         }
 
         @Override
         protected void interpolate(double k) {
-            int index = updateAnimation(36 * k) + (cursor.getColor().equals("red") ? 10 : 0);
+            int index = (updateAnimation(36 * k) + (cursor.getColor().equals("red") ? 10 : 0));
             if ((index != lastIndex) && ((cursor.getUnit() != null && !cursor.getUnit().getColor().equals("blue")) || cursor.getUnit() == null || cursor.getSelectedUnit() != null)) {
                 backup = CursorMap.get(index);
                 imv.setImage(CursorMap.get(index));

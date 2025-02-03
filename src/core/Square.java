@@ -1,6 +1,4 @@
 package core;
-
-import gui.ResizableImage;
 import terrains.*;
 import units.Unit;
 import javafx.scene.image.Image;
@@ -43,22 +41,14 @@ public class Square {
             put(29, "Wall");
             put(30, "Wall_Weak");
         }};
-    int x;
-    int y;
-    ResizableImage originalTexture;
+    byte x;
+    byte y;
     Image originaltexture;
     private Terrain terrain = new VoidTile();
     private Unit unit = null;
     private boolean isReachable = false;
     private boolean inRange = false;
-
-
-    public Square(ResizableImage image,int i, int j){
-        this.originalTexture = image;
-        x = j;
-        y = i;
-    }
-    public Square(Image image, int i, int j){
+    public Square(Image image, byte i, byte j){
         this.originaltexture = image;
         x = j;
         y = i;
@@ -114,18 +104,12 @@ public class Square {
         this.unit = unit;
     }
 
-    public ResizableImage getOriginalTexture(){
-        return originalTexture;
-    }
-
     public Image getOriginaltexture() {
         return originaltexture;
     }
-
     public Terrain getTerrain(){
         return terrain;
     }
-
     public void reach(boolean b) {
         isReachable = b;
     }

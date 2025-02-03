@@ -1,6 +1,7 @@
 package Items.Consumables;
 
 import Items.Item;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 import java.io.IOException;
@@ -31,10 +32,8 @@ public abstract class Consumable implements Item {
     public int getUses() {
         return uses;
     }
-
     @Override
-    public abstract Image getIcon();
-
+    public void drawIcon(GraphicsContext g, double x, double y){}
     @Override
     public int getPrice() {
         return price;

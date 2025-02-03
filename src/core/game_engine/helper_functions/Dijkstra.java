@@ -1,30 +1,29 @@
 package core.game_engine.helper_functions;
 
 import core.Board;
-import core.Coord;
-import units.Unit;
 import javafx.util.Pair;
 
 import java.util.*;
 
 public class Dijkstra{
-    private static final int[] moveRow = {-1, 1, 0, 0}, moveCol = {0,0,-1,1};
-    public static Pair<ArrayList<Coord>, ArrayList<Coord>> findMoves(Board board, int i, int j, int mov, String unitType){
-        int width = board.getWidth();
-        int height = board.getHeight();
+    private static final byte[] moveRow = {-1, 1, 0, 0}, moveCol = {0,0,-1,1};
+    public static Pair<ArrayList<Coord>, ArrayList<Coord>> findMoves(Board board, byte i, byte j, byte mov, String unitType){
+        byte width = board.getWidth();
+        byte height = board.getHeight();
 
         final PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(a->a.distance));
-        int[][] distances = new int[height][width];
-        for (int[] row : distances) Arrays.fill(row, Integer.MAX_VALUE);
+        short[][] distances = new short[height][width];
+        for (short[] row : distances) Arrays.fill(row, Byte.MAX_VALUE);
 
         distances[i][j] = 0;
-        queue.offer(new Node(j,i,0));
+        queue.offer(new Node(j,i,(short)0));
         ArrayList<Coord> availableMoves = new ArrayList<>(), tilesInRange = new ArrayList<>(), occupiedTiles = new ArrayList<>();
         Node prev = null;
 
         while (!queue.isEmpty()){
             Node cur = queue.poll();
-            int x = cur.getFirst(), y = cur.getLast(), distance = cur.distance;
+            byte x = cur.getFirst(), y = cur.getLast();
+            short distance = cur.distance;
             if (prev != null && board.get(y,x).getUnit() != null) occupiedTiles.add(new Coord(x,y));
 
             if (distance > mov) {
@@ -34,12 +33,12 @@ public class Dijkstra{
             availableMoves.add(new Coord(x,y));
 
             for (int k = 0; k < 4; k++) {
-                int newX = x + moveRow[k], newY = y + moveCol[k];
+                byte newX = (byte) (x + moveRow[k]), newY = (byte) (y + moveCol[k]);
                 if (newX >= 0 && newY >= 0 && newX < width && newY < height){
                     if (board.get(newY,newX).getTerrain().getMovPenalty(unitType) < 0) continue;
-                    int newDistance = distance + board.get(newY,newX).getTerrain().getMovPenalty(unitType);
+                    short newDistance = (short) (distance + board.get(newY,newX).getTerrain().getMovPenalty(unitType));
                     if (newDistance < distances[newY][newX]){
-                        distances[newY][newX] = newDistance;
+                        distances[newY][newX] = (short) newDistance;
                         queue.offer(new Node(newX,newY,newDistance));
                     }
                 }
@@ -61,15 +60,15 @@ public class Dijkstra{
             queue.offer(coord);
             visitedNodes[coord.getLast()][coord.getFirst()] = false;
         }
-        int distance = 0;
+        short distance = 0;
         while (!queue.isEmpty() && distance < range){
             int levelSize = queue.size();
-            for (int i = 0; i < levelSize; i++) {
+            for (short i = 0; i < levelSize; i++) {
                 Coord cur = queue.poll();
                 assert cur != null;
-                for (int j = 0; j < 4; j++){
-                    int x = cur.getFirst() + moveRow[j];
-                    int y = cur.getLast() + moveCol[j];
+                for (byte j = 0; j < 4; j++){
+                    byte x = (byte) (cur.getFirst() + moveRow[j]);
+                    byte y = (byte) (cur.getLast() + moveCol[j]);
                     if (x>=0 && y>=0 && x<w && y<h && !visitedNodes[y][x]){
                         Coord next = new Coord(x,y);
                         visitedNodes[y][x] = true;
@@ -87,19 +86,19 @@ public class Dijkstra{
     public static ArrayList<Coord> findPath(Coord start, Coord end, Board board, String unitType) {
         if (start.equals(end)) return null;  // No path if start and end are the same
 
-        final int width = board.getWidth();
-        final int height = board.getHeight();
+        final byte width = board.getWidth();
+        final byte height = board.getHeight();
 
         // Priority queue for Dijkstra's algorithm (sorted by distance)
         final PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(a -> a.distance));
 
         // Distance array to track shortest distance from start to each position
-        int[][] distances = new int[height][width];
-        for (int[] row : distances) Arrays.fill(row, Integer.MAX_VALUE);
+        short[][] distances = new short[height][width];
+        for (short[] row : distances) Arrays.fill(row, Short.MAX_VALUE);
 
         // Predecessor array to track the predecessor for each position using a 1D index
-        int[] predecessor = new int[width * height];
-        Arrays.fill(predecessor, -1);  // -1 indicates no predecessor (unvisited)
+        short[] predecessor = new short[width * height];
+        Arrays.fill(predecessor, (short) -1);  // -1 indicates no predecessor (unvisited)
 
         // Map (x, y) to a single index in 1D array: index = y * width + x
         int startIndex = start.getLast() * width + start.getFirst();
@@ -107,7 +106,7 @@ public class Dijkstra{
 
         // Initialize distance for the start position
         distances[start.getLast()][start.getFirst()] = 0;
-        queue.offer(new Node(start.getFirst(), start.getLast(), 0));
+        queue.offer(new Node(start.getFirst(), start.getLast(), (short)0));
 
         while (!queue.isEmpty()) {
             Node cur = queue.poll();
@@ -117,15 +116,15 @@ public class Dijkstra{
             if (cur.getFirst() == end.getFirst() && cur.getLast() == end.getLast()) break;
 
             // Explore the 4 neighboring tiles
-            for (int i = 0; i < 4; i++) {
-                int newX = x + moveRow[i];
-                int newY = y + moveCol[i];
+            for (byte i = 0; i < 4; i++) {
+                byte newX = (byte) (x + moveRow[i]);
+                byte newY = (byte) (y + moveCol[i]);
 
                 // Check if the new position is within the grid and is traversable
                 if (newX >= 0 && newY >= 0 && newX < width && newY < height) {
                     if (board.get(newY, newX).getTerrain().getMovPenalty(unitType) < 0) continue;  // Skip if unreachable
 
-                    int newDistance = distance + board.get(newY, newX).getTerrain().getMovPenalty(unitType);
+                    short newDistance = (short) (distance + board.get(newY, newX).getTerrain().getMovPenalty(unitType));
 
                     // Relaxation step: update if a shorter path is found
                     if (newDistance < distances[newY][newX]) {
@@ -133,8 +132,8 @@ public class Dijkstra{
                         queue.offer(new Node(newX, newY, newDistance));
 
                         // Store the predecessor using 1D indexing
-                        int newIndex = newY * width + newX;
-                        predecessor[newIndex] = y * width + x;  // Store where we came from
+                        short newIndex = (short) (newY * width + newX);
+                        predecessor[newIndex] = (short) (y * width + x);  // Store where we came from
                     }
                 }
             }
@@ -149,8 +148,8 @@ public class Dijkstra{
 
         // Backtrack from end to start
         while (step != startIndex) {
-            int stepX = step % width;  // Convert 1D index back to 2D coordinates
-            int stepY = step / width;
+            byte stepX = (byte) (step % width);  // Convert 1D index back to 2D coordinates
+            byte stepY = (byte) (step / width);
             path.add(new Coord(stepX, stepY));
             step = predecessor[step];  // Move to the predecessor node
         }
@@ -164,14 +163,10 @@ public class Dijkstra{
         return path;
     }
     private static class Node extends Coord {
-        private int distance;
-        Node(int x, int y, int distance){
+        private short distance;
+        Node(byte x, byte y, short distance){
             super(x,y);
             this.distance = distance;
-        }
-
-        public Node(short x, short y) {
-            super(x,y);
         }
     }
 }

@@ -1,8 +1,7 @@
 package gui;
 
-import core.Coord;
+import core.game_engine.helper_functions.Coord;
 import events.KeyEventHandler;
-import gui.Animations.ImageViewer;
 import gui.Combat.CombatRenderer;
 import core.Board;
 import core.Cursor;
@@ -37,7 +36,6 @@ public class Battle {
     private static Scene gameScene = new Scene(root);
     private final Pane unitPane = new Pane(), colouredSquaresPane = new Pane(), arrowPane = new Pane();
     public final Pane MenuPane = new Pane();
-    public GameInterface gameInterface;
     //ColouredSquaresAnimation colouredSquaresAnimation;
     private ImageView background;
     private final MenuSelector menuSelector = new MenuSelector();
@@ -72,8 +70,7 @@ public class Battle {
         ReadMapFile mapFile = new ReadMapFile("CH1");
         loadBoard(mapFile);
         loadCursor();
-        gameInterface = new GameInterface(board);
-        MenuPane.getChildren().addAll(gameInterface.drawMenu(Integer.toString(board.get(cursor.getSquare()).getTerrain().getDef()), Integer.toString(board.get(cursor.getSquare()).getTerrain().getAvoid()), board.get(cursor.getSquare()).getTerrain().toString(), mapFile.getObjectives()));
+        MenuPane.getChildren().addAll(GameInterface.drawMenu(Integer.toString(board.get(cursor.getSquare()).getTerrain().getDef()), Integer.toString(board.get(cursor.getSquare()).getTerrain().getAvoid()), board.get(cursor.getSquare()).getTerrain().toString(), mapFile.getObjectives()));
         window.setTitle("Fire Emblem");
         window.show();
         window.setScene(gameScene);
@@ -90,7 +87,7 @@ public class Battle {
 
     public void b() throws IOException {
         root = (Pane) gameScene.getRoot();
-        new CombatRenderer( window, board, board.get(2, 2).getUnit(), board.get(6, 5).getUnit());
+        new CombatRenderer( window, board, board.get((byte) 2, (byte) 2).getUnit(), board.get((byte) 6, (byte) 5).getUnit());
     }
 
     public void revertToGameScene() {
@@ -250,21 +247,11 @@ public class Battle {
     }
 
     private void setSquaresFitWidth(double width) {
-        colouredSquaresPane.getChildren().forEach(sq -> {
-            if (sq instanceof ImageViewer) {
-                ((ImageViewer) sq).setFitWidth(width);
-                sq.setTranslateX(width * ((ImageViewer) sq).getXValue());
-            }
-        });
+
     }
 
     private void setSquaresFitHeight(double height) {
-        colouredSquaresPane.getChildren().forEach(sq -> {
-            if (sq instanceof ImageViewer) {
-                ((ImageViewer) sq).setFitHeight(height);
-                sq.setTranslateY(height * ((ImageViewer) sq).getYValue());
-            }
-        });
+
     }
 
     private void setUnitFitWidth(double width) {
@@ -475,7 +462,7 @@ public class Battle {
                 }
                 break;
         }
-        gameInterface.updateTI(((ImageView) MenuPane.getChildren().getFirst()), board.get(cursor.getSquare()).getTerrain().defToString(), board.get(cursor.getSquare()).getTerrain().avoToString(), board.get(cursor.getSquare()).getTerrain().toString());
+        GameInterface.updateTI(((ImageView) MenuPane.getChildren().getFirst()), board.get(cursor.getSquare()).getTerrain().defToString(), board.get(cursor.getSquare()).getTerrain().avoToString(), board.get(cursor.getSquare()).getTerrain().toString());
         path = null;
         if (cursor.getSelectedUnit() != null) {
             if (cursor.getSelectedUnit().getAvailableMoves().contains(cursor.getSquare())) {
@@ -507,7 +494,7 @@ public class Battle {
             } else menuSelector.setTranslateY(menuSelector.getTranslateY() + 3 * 16);
         }
         if (menuId == 10){
-            gameInterface.buildWeaponMenu(getActiveMenu(3), cursor.getSelectedUnit(),cursor.getSelectedUnit().getInventory().getWeapons().get((int)(menuSelector.getTranslateY()-27)/48));
+            GameInterface.buildWeaponMenu(getActiveMenu(3), cursor.getSelectedUnit(),cursor.getSelectedUnit().getInventory().getWeapons().get((int)(menuSelector.getTranslateY()-27)/48));
         }
     }
 
@@ -578,7 +565,7 @@ public class Battle {
                 cursor.setTo(Enemies.getFirst());
                 cursor.setColor("red");
                 cursor.getIMV().setVisible(true);
-                ImageView forecast = gameInterface.drawForecast(cursor.getSelectedUnit(),cursor.getUnit());
+                ImageView forecast = GameInterface.drawForecast(cursor.getSelectedUnit(),cursor.getUnit());
                 MenuPane.getChildren().add(forecast);
                 menuId+=1;
                 break;
@@ -593,7 +580,8 @@ public class Battle {
     private void selectAction(Unit movingUnit, boolean isAttacking, boolean isTradingItems) throws IOException {
         switch ((int) menuSelector.getTranslateY() + (isAttacking ? 0 : 48) + (isTradingItems || (isAttacking && (int) menuSelector.getTranslateY() == 105) ? 0 : 48)) {
             case 105: //Attack
-                List<ImageView> WeaponMenu = gameInterface.drawWeaponMenu(cursor.getSelectedUnit());
+                List<ImageView> WeaponMenu = GameInterface
+                        .drawWeaponMenu(cursor.getSelectedUnit());
                 WeaponMenu.getFirst().setTranslateX(tileWidth * 3 / 4);
                 WeaponMenu.getFirst().setTranslateY(tileHeight * 3 / 4);
                 WeaponMenu.get(1).setTranslateX(window.getWidth() - WeaponMenu.get(1).getImage().getWidth() / 2 - tileWidth * 11 / 16);

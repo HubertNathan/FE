@@ -1,8 +1,8 @@
-package core;
+package core.game_engine.helper_functions;
 
 public class Stats {
-    private short LVL, HP, Str, Mag, Skl, Spd, Lck, Def, Res, Mov, Con;
-    public Stats(short[] stats){
+    private byte LVL, HP, Str, Mag, Skl, Spd, Lck, Def, Res, Mov, Con;
+    public Stats(byte[] stats){
         assert stats.length == 11;
         LVL = stats[0];
         HP = stats[1];
@@ -16,70 +16,70 @@ public class Stats {
         Mov = stats[9];
         Con = stats[10];
     }
-    public short getLVL() {
+    public byte getLVL() {
         return LVL;
     }
-    public short getHP() {
+    public byte getHP() {
         return HP;
     }
-    public short getStr() {
+    public byte getStr() {
         return Str;
     }
-    public short getMag() {
+    public byte getMag() {
         return Mag;
     }
-    public short getSkl() {
+    public byte getSkl() {
         return Skl;
     }
-    public short getSpd() {
+    public byte getSpd() {
         return Spd;
     }
-    public short getLck() {
+    public byte getLck() {
         return Lck;
     }
-    public short getDef() {
+    public byte getDef() {
         return Def;
     }
-    public short getRes() {
+    public byte getRes() {
         return Res;
     }
-    public short getMov() {
+    public byte getMov() {
         return Mov;
     }
-    public short getCon() {
+    public byte getCon() {
         return Con;
     }
-    public void setLVL(short LVL) {
+    public void setLVL(byte LVL) {
         this.LVL = LVL;
     }
-    public void setHP(short HP) {
+    public void setHP(byte HP) {
         this.HP = HP;
     }
-    public void setStr(short str) {
+    public void setStr(byte str) {
         Str = str;
     }
-    public void setMag(short mag) {
+    public void setMag(byte mag) {
         Mag = mag;
     }
-    public void setSkl(short skl) {
+    public void setSkl(byte skl) {
         Skl = skl;
     }
-    public void setSpd(short spd) {
+    public void setSpd(byte spd) {
         Spd = spd;
     }
-    public void setLck(short lck) {
+    public void setLck(byte lck) {
         Lck = lck;
     }
-    public void setDef(short def) {
+    public void setDef(byte def) {
         Def = def;
     }
-    public void setRes(short res) {
+    public void setRes(byte res) {
         Res = res;
     }
-    public void setMov(short mov) {
+    public void setMov(byte mov) {
         Mov = mov;
     }
-    public void setCon(short con) {
+    public void setCon(byte con) {
         Con = con;
     }
 }

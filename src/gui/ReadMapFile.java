@@ -10,8 +10,6 @@ public class ReadMapFile {
     private final String path2;
     private final List<String> map = new ArrayList<>();
     private int[] dimensions;
-    private ResizableImage tileSetData;
-    private SpriteSheet spriteSheet;
     private String chapter;
     private String Objectives;
     private final List<String> terrains = new ArrayList<>();
@@ -34,7 +32,6 @@ public class ReadMapFile {
             chapter = mapReader.nextLine();
             Objectives = mapReader.nextLine();
             String tileSet = mapReader.nextLine();
-            tileSetData =  new ResizableImage("file:MapGeneration/Tilesets/" + tileSet + ".png");
             SpriteSheet.loadSheet("file:MapGeneration/Tilesets/" + tileSet + ".png");
             dimensions = Stream.of(mapReader.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
             while (mapReader.hasNextLine()) {
@@ -60,28 +57,10 @@ public class ReadMapFile {
     public List<String> getMap() {
         return map;
     }
-
-    public ResizableImage getTileSetData() {
-        return tileSetData;
-    }
-
-    public SpriteSheet getSpriteSheet() {
-        return spriteSheet;
-    }
-
-    public String getChapter(){
-        return chapter;
-    }
     public List<String> getTerrains(){
         return terrains;}
 
     public String getObjectives() {
         return Objectives;
-    }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        ReadMapFile mapFile = new ReadMapFile("CH1");
-
-
     }
 }

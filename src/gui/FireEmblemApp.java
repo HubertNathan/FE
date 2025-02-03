@@ -36,7 +36,6 @@ public class FireEmblemApp extends Application {
     private static final Scene menuScene = new Scene(menuPane);
     private Pane glowingPane = new Pane();
     private int menuId, buttonID = 0;
-    private final TextInterpreter TI = new TextInterpreter();
     private static ImageView cursor = new ImageView();
     DragonAnimation dragonAnimation;
     private static Stage window;
@@ -44,9 +43,9 @@ public class FireEmblemApp extends Application {
     int month = 1;
     String bloodType = "A";
     String gender = "Male";
-    public static int TILE_SIZE = 96;
-    private static int WIDTH = 15*TILE_SIZE;
-    private static int HEIGHT = 10*TILE_SIZE;
+    public static int TILE_SIZE = 48;
+    private static final int WIDTH = 15*TILE_SIZE;
+    private static final int HEIGHT = 10*TILE_SIZE;
 
     public FireEmblemApp() throws IOException {
     }
@@ -61,7 +60,6 @@ public class FireEmblemApp extends Application {
         window.setHeight(HEIGHT+37);
         window.setWidth(WIDTH);
         window.setScene(menuScene);
-        menuScene.setOnKeyPressed(new MenuEventListener());
         //loadMenu(0);
         window.show();
         //new Battle(window);
@@ -239,7 +237,7 @@ public class FireEmblemApp extends Application {
                     setFitHeight(8*3);
                 }});
 
-                playTime.getChildren().add(new ImageView(TI.convertTime(Save.loadTime(1),"")){{
+                playTime.getChildren().add(new ImageView(TextInterpreter.convertTime(Save.loadTime(1),"")){{
                     setFitWidth(getImage().getWidth()/2);
                     setFitHeight(30);
                     setTranslateX(240*3-getFitWidth());
@@ -376,13 +374,13 @@ public class FireEmblemApp extends Application {
                     setStyle("-fx-font-size: 38px;");
                     setFont(font2);
                 }});
-                ResizableImage symbolsAsImg = new ResizableImage("file:Resources/FE7Symbols.png",472,274);
-                menuPane.getChildren().add(new ImageView(symbolsAsImg.getSubimage((138+getTacticianAffinity("A",1)*15)*6,17*6,14*6,14*6)){{
-                    setFitWidth(14*3);
-                    setFitHeight(14*3);
-                    setTranslateX(113*3);
-                    setTranslateY(42*3);
-                }});
+                //ResizableImage symbolsAsImg = new ResizableImage("file:Resources/FE7Symbols.png",472,274);
+                //menuPane.getChildren().add(new ImageView(symbolsAsImg.getSubimage((138+getTacticianAffinity("A",1)*15)*6,17*6,14*6,14*6)){{
+                //    setFitWidth(14*3);
+                //    setFitHeight(14*3);
+                //    setTranslateX(113*3);
+                //    setTranslateY(42*3);
+                //}});
 
                 menuPane.getChildren().add(textPane);
 
@@ -688,20 +686,20 @@ public class FireEmblemApp extends Application {
                                 setStyle("-fx-font-size: 48px;");
                                 setFont(Font.loadFont("file:Resources/ThinFont.otf",38));
                             }});
-                            ResizableImage symbolsAsImg = new ResizableImage("file:Resources/FE7Symbols.png",472,274);
-                            ResizableImage icon;
-                            try {
-                                icon = symbolsAsImg.getSubimage((138 + getTacticianAffinity(bloodType, month) * 15) * 6, 17 * 6, 14 * 6, 14 * 6);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
+                            //ResizableImage symbolsAsImg = new ResizableImage("file:Resources/FE7Symbols.png",472,274);
+                            //ResizableImage icon;
+                            //try {
+                                //icon = symbolsAsImg.getSubimage((138 + getTacticianAffinity(bloodType, month) * 15) * 6, 17 * 6, 14 * 6, 14 * 6);
+                            //} catch (IOException e) {
+                            //    throw new RuntimeException(e);
+                            //}
                             menuPane.getChildren().remove(4);
-                            menuPane.getChildren().add(4, new ImageView(icon) {{
-                                setFitWidth(14 * 3);
-                                setFitHeight(14 * 3);
-                                setTranslateX(113 * 3);
-                                setTranslateY(42 * 3);
-                            }});
+                            //menuPane.getChildren().add(4, new ImageView(icon) {{
+                            //    setFitWidth(14 * 3);
+                            //    setFitHeight(14 * 3);
+                            //    setTranslateX(113 * 3);
+                            //    setTranslateY(42 * 3);
+                            //}});
                             break;
                     }
                     break;
@@ -757,20 +755,20 @@ public class FireEmblemApp extends Application {
                                 setStyle("-fx-font-size: 38px;");
                                 setFont(Font.loadFont("file:Resources/ThinFont.otf",38));
                             }});
-                            ResizableImage symbolsAsImg = new ResizableImage("file:Resources/FE7Symbols.png",472,274);
-                            ResizableImage icon;
-                            try {
-                                icon = symbolsAsImg.getSubimage((138 + getTacticianAffinity(bloodType, month) * 15) * 6, 17 * 6, 14 * 6, 14 * 6);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
+                            //ResizableImage symbolsAsImg = new ResizableImage("file:Resources/FE7Symbols.png",472,274);
+                            //ResizableImage icon;
+                            //try {
+                            //    icon = symbolsAsImg.getSubimage((138 + getTacticianAffinity(bloodType, month) * 15) * 6, 17 * 6, 14 * 6, 14 * 6);
+                            //} catch (IOException e) {
+                            //    throw new RuntimeException(e);
+                            //}
                             menuPane.getChildren().remove(4);
-                            menuPane.getChildren().add(4, new ImageView(icon) {{
-                                setFitWidth(14 * 3);
-                                setFitHeight(14 * 3);
-                                setTranslateX(113 * 3);
-                                setTranslateY(42 * 3);
-                            }});
+                            //menuPane.getChildren().add(4, new ImageView(icon) {{
+                            //    setFitWidth(14 * 3);
+                            //    setFitHeight(14 * 3);
+                            //    setTranslateX(113 * 3);
+                            //    setTranslateY(42 * 3);
+                            //}});
                             menuSelector.play();
                             break;
                     }
@@ -897,7 +895,7 @@ public class FireEmblemApp extends Application {
         dragonAnimation.translateY(32*3*delta);
         glowingPane.getChildren().add(dragonL);
         int i = (int)((Pane) menuPane.getChildren().getLast()).getChildren().getFirst().getTranslateY()/96;
-        ((ImageView)((Pane)menuPane.getChildren().get(4)).getChildren().getLast()).setImage(TI.convertTime(Save.loadTime(i),""));
+        ((ImageView)((Pane)menuPane.getChildren().get(4)).getChildren().getLast()).setImage(TextInterpreter.convertTime(Save.loadTime(i),""));
 
 
 

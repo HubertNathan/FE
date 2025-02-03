@@ -37,7 +37,6 @@ public class CombatRenderer {
     private Unit killedUnit;
     private final CombatHandler combatHandler;
     //private final Battle FEApp;
-    private final TextInterpreter TI = new TextInterpreter();
     List<Boolean> turn;
     public CombatRenderer(Stage window, Board board, Unit attacker, Unit defender) throws IOException {
         //this.FEApp = FEApp;
@@ -115,20 +114,20 @@ public class CombatRenderer {
         final Image[] text = new Image[1];
         Platform.runLater(()->
         {
-            try {
-                text[0] = TI.convertTxt(attacker.toString(), "white");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            //try {
+            //    //text[0] = TextInterpreter.convertTxt(attacker.toString(), "white");
+            //} catch (IOException e) {
+            //    throw new RuntimeException(e);
+            //}
             upperCanvas.getGraphicsContext2D().drawImage(text[0], dx1 + (48 * 6 - text[0].getWidth()) / 2, 6 * 6 + (21 * 6 - text[0].getHeight()) / 2);
         });
         Platform.runLater(()->
         {
-            try {
-                text[0] = TI.convertTxt(defender.toString(), "white");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            //try {
+            //    text[0] = TextInterpreter.convertTxt(defender.toString(), "white");
+            //} catch (IOException e) {
+            //    throw new RuntimeException(e);
+            //}
             upperCanvas.getGraphicsContext2D().drawImage(text[0], dx2 + (48 * 6 - text[0].getWidth()) / 2, 6 * 6 + (21 * 6 - text[0].getHeight()) / 2);
                 });
 
@@ -148,13 +147,12 @@ public class CombatRenderer {
         Canvas lowerCanvas = new Canvas(240*6,51*6);
         lowerCanvas.getGraphicsContext2D().drawImage(new Image("file:Resources/MenuSprites/Lower_Scene.png",240*6,51*6,false,false),0,0);
         List<Integer> Numbers = combatHandler.getCombatStats(!attacker.getColor().equals("red"));
-        TextInterpreter TI = new TextInterpreter();
         final Image[] img = new Image[1];
         for (int i = 0; i < 6; i++) {
             int finalI = i;
             Platform.runLater(()-> {
                 try {
-                    img[0] = TI.convertBattleNumbers(Numbers.get(finalI));
+                    img[0] = TextInterpreter.convertBattleNumbers(Numbers.get(finalI));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -162,20 +160,20 @@ public class CombatRenderer {
             });
         }
 
-        lowerCanvas.getGraphicsContext2D().drawImage(attacker.getWieldedWeapon().getIcon(),123*6,12*6);
-        lowerCanvas.getGraphicsContext2D().drawImage(defender.getWieldedWeapon().getIcon(),44*6,12*6);
+        //lowerCanvas.getGraphicsContext2D().drawImage(attacker.getWieldedWeapon().getIcon(),123*6,12*6);
+        //lowerCanvas.getGraphicsContext2D().drawImage(defender.getWieldedWeapon().getIcon(),44*6,12*6);
 
         Platform.runLater(()-> {
-            try {
+            //try {
 
-                img[0] = TI.convertTxt(attacker.getWieldedWeapon().getName(), "white");
-                lowerCanvas.getGraphicsContext2D().drawImage(img[0], 139 * 6 + 19 * 6 - img[0].getWidth() / 3, 14 * 6);
+                //img[0] = TextInterpreter.convertTxt(attacker.getWieldedWeapon().getName(), "white");
+            //    lowerCanvas.getGraphicsContext2D().drawImage(img[0], 139 * 6 + 19 * 6 - img[0].getWidth() / 3, 14 * 6);
 
-                img[0] = TI.convertTxt(defender.getWieldedWeapon().getName(), "white");
-                lowerCanvas.getGraphicsContext2D().drawImage(img[0], 60 * 6 + 19 * 6 - img[0].getWidth() / 3, 14 * 6);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+                //img[0] = TextInterpreter.convertTxt(defender.getWieldedWeapon().getName(), "white");
+            //    lowerCanvas.getGraphicsContext2D().drawImage(img[0], 60 * 6 + 19 * 6 - img[0].getWidth() / 3, 14 * 6);
+            //} catch (IOException e) {
+            //    throw new RuntimeException(e);
+            //}
                 });
         Platform.runLater(()->{
         LowerPane.getChildren().add(new ImageView(lowerCanvas.snapshot(new SnapshotParameters(){{setFill(Color.TRANSPARENT);}},null)){{
@@ -188,8 +186,8 @@ public class CombatRenderer {
     }
     private void addHealthBar() throws IOException {
 
-        ImageView atkHealth = new ImageView(TI.convertBattleNumbers(attacker.getHealth()));
-        ImageView defHealth = new ImageView(TI.convertBattleNumbers(defender.getHealth()));
+        ImageView atkHealth = new ImageView(TextInterpreter.convertBattleNumbers(attacker.getHealth()));
+        ImageView defHealth = new ImageView(TextInterpreter.convertBattleNumbers(defender.getHealth()));
         atkHealth.setFitHeight(atkHealth.getImage().getHeight()/2);
         atkHealth.setFitWidth(atkHealth.getImage().getWidth()/2);
         defHealth.setFitHeight(defHealth.getImage().getHeight()/2);
@@ -353,7 +351,7 @@ public class CombatRenderer {
             ((Rectangle) LowerPane.getChildren().get(5)).setWidth(6*(unit.getHealth()-hit));
             ((Rectangle) LowerPane.getChildren().get(6)).setWidth(6*(unit.getHealth()-hit));
             ((Rectangle) LowerPane.getChildren().get(7)).setWidth(6*(unit.getHealth()-hit));
-            ((ImageView) LowerPane.getChildren().get(1)).setImage(TI.convertBattleNumbers(unit.getHealth() - hit));
+            ((ImageView) LowerPane.getChildren().get(1)).setImage(TextInterpreter.convertBattleNumbers(unit.getHealth() - hit));
             if (unit.getHealth() >= 10 && unit.getHealth() - hit < 10) {
                 ((ImageView) LowerPane.getChildren().get(1)).setFitWidth(8*3);
                 LowerPane.getChildren().get(1).setTranslateX(LowerPane.getChildren().get(1).getTranslateX() + 8*3);
@@ -364,14 +362,14 @@ public class CombatRenderer {
             ((Rectangle) LowerPane.getChildren().get(8)).setWidth(6*(unit.getHealth()-hit));
             ((Rectangle) LowerPane.getChildren().get(9)).setWidth(6*(unit.getHealth()-hit));
             ((Rectangle) LowerPane.getChildren().get(10)).setWidth(6*(unit.getHealth()-hit));
-            ((ImageView) LowerPane.getChildren().get(2)).setImage(TI.convertBattleNumbers(unit.getHealth() - hit));
+            ((ImageView) LowerPane.getChildren().get(2)).setImage(TextInterpreter.convertBattleNumbers(unit.getHealth() - hit));
             if (unit.getHealth() >= 10 && unit.getHealth() - hit < 10) {
                 ((ImageView) LowerPane.getChildren().get(2)).setFitWidth(8*3);
                 LowerPane.getChildren().get(2).setTranslateX(LowerPane.getChildren().get(2).getTranslateX() + 8*3);
 
             }
         }
-        unit.setHealth((short) (unit.getHealth()-hit));
+        unit.setHealth((byte) (unit.getHealth()-hit));
     }
 
     private HashMap<Integer, Integer> interpolateHealthValues(int dmg) {

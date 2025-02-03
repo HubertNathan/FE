@@ -1,5 +1,6 @@
 package core;
 
+import core.game_engine.helper_functions.Coord;
 import gui.ReadMapFile;
 import gui.SpriteSheet;
 import units.Unit;
@@ -12,8 +13,8 @@ import java.util.Collections;
 import static core.game_engine.Battle.BattleEngine.tileSize;
 
 public class Board{
-    private int height;
-    private int width;
+    private byte height;
+    private byte width;
     private Square[][] board;
     private ArrayList<Unit> units;
 
@@ -21,39 +22,39 @@ public class Board{
 
     public void init(ReadMapFile mapReader){
         int[] dimensions = mapReader.getDimensions();
-        height = dimensions[0];
-        width = dimensions[1];
+        height = (byte) dimensions[0];
+        width = (byte) dimensions[1];
         board = new Square[height][width];
         units = new ArrayList<>(Collections.nCopies(board.length * board[0].length, null));
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
+        for (byte i = 0; i < height; i++) {
+            for (byte j = 0; j < width; j++) {
                 String terrain = mapReader.getMap().get(width*i+j);
-                int terrainType = Integer.parseInt(mapReader.getTerrains().get(width*i+j));
+                byte terrainType = (byte) Integer.parseInt(mapReader.getTerrains().get(width*i+j));
                 board[i][j] = new Square(SpriteSheet.getTile((Integer.parseInt(terrain)%32), (Integer.parseInt(terrain)/32)),i,j);
                 board[i][j].setTerrainType(terrainType);
             }
         }
     }
-    public Square get(int i, int j){
+    public Square get(byte i, byte j){
         return board[i][j];
     }
     public Square get(Coord pos) {
         return this.get(pos.getLast(),pos.getFirst());
     }
 
-    public int getHeight() {
+    public byte getHeight() {
         return height;
     }
-    public int getWidth() {
+    public byte getWidth() {
         return width;
     }
-    public void setUnit(Unit unit,short i, short j){
+    public void setUnit(Unit unit,byte i, byte j){
         units.add(j+board.length * i,unit);
         board[i][j].setUnit(unit);
         unit.setX(j);
         unit.setY(i);
     }
-    public void setUnit(Unit unit,short i, short j, boolean isLeader){
+    public void setUnit(Unit unit,byte i, byte j, boolean isLeader){
         unit.setLeader(isLeader);
         setUnit(unit,i,j);
     }

@@ -17,15 +17,14 @@ public class UnitSelectionState implements GameState{
     private final Cursor cursor;
     private static final Board board = BattleEngine.getBoard();
     private static final Pane pane = BattleEngine.getOverlayPane();
-    private final GameInterface gi;
     private GameStateContext context;
     private final String objectives;
-    public UnitSelectionState(Cursor cursor, GameInterface gi, String objectives) throws IOException {
+    public UnitSelectionState(Cursor cursor, String objectives) throws IOException {
         this.cursor = cursor;
-        this.gi = gi;
         this.objectives = objectives;
-        pane.getChildren().addAll(gi.drawMenu(Integer.toString(board.get(cursor.getSquare()).getTerrain().getDef()), Integer.toString(board.get(cursor.getSquare()).getTerrain().getAvoid()), board.get(cursor.getSquare()).getTerrain().toString(), objectives));
+        pane.getChildren().addAll(GameInterface.drawMenu(Integer.toString(board.get(cursor.getSquare()).getTerrain().getDef()), Integer.toString(board.get(cursor.getSquare()).getTerrain().getAvoid()), board.get(cursor.getSquare()).getTerrain().toString(), objectives));
         transitionIn();
+
     }
     @Override
     public void handleInput(KeyEvent e) throws IOException {
@@ -48,23 +47,23 @@ public class UnitSelectionState implements GameState{
         cursor.moveUp();
         cursor.endMove();
         if (cursor.getXValue() > board.getWidth() / 2 && cursor.getYValue() == board.getHeight() / 2 - 1) {
-            gi.animate((ImageView) pane.getChildren().get(3),(ImageView) pane.getChildren().get(4), 2, true);
+            GameInterface.animate((ImageView) pane.getChildren().get(3),(ImageView) pane.getChildren().get(4), 2, true);
         }
-        gi.updateTI((ImageView) pane.getChildren().get(2),board.get(cursor.getSquare()).getTerrain().defToString(),board.get(cursor.getSquare()).getTerrain().avoToString(),board.get(cursor.getSquare()).getTerrain().toString());
+        GameInterface.updateTI((ImageView) pane.getChildren().get(2),board.get(cursor.getSquare()).getTerrain().defToString(),board.get(cursor.getSquare()).getTerrain().avoToString(),board.get(cursor.getSquare()).getTerrain().toString());
     }
     private void moveDown() throws IOException {
         cursor.moveDown();
         cursor.endMove();
         if (cursor.getXValue() > board.getWidth() / 2 && cursor.getYValue() == board.getHeight() / 2 ) {
-            gi.animate((ImageView) pane.getChildren().get(3),(ImageView) pane.getChildren().get(4), 2, false);
+            GameInterface.animate((ImageView) pane.getChildren().get(3),(ImageView) pane.getChildren().get(4), 2, false);
         }
-        gi.updateTI((ImageView) pane.getChildren().get(2),board.get(cursor.getSquare()).getTerrain().defToString(),board.get(cursor.getSquare()).getTerrain().avoToString(),board.get(cursor.getSquare()).getTerrain().toString());
+        GameInterface.updateTI((ImageView) pane.getChildren().get(2),board.get(cursor.getSquare()).getTerrain().defToString(),board.get(cursor.getSquare()).getTerrain().avoToString(),board.get(cursor.getSquare()).getTerrain().toString());
     }
     private void moveLeft() throws IOException {
         cursor.moveLeft();
         cursor.endMove();
         if (cursor.getXValue() == board.getWidth() / 2 && cursor.getYValue() < board.getHeight() / 2) {
-            gi.animate(
+            GameInterface.animate(
                     new ImageView[]{
                             (ImageView) pane.getChildren().get(1),
                             (ImageView) pane.getChildren().get(2),
@@ -74,16 +73,16 @@ public class UnitSelectionState implements GameState{
                     new boolean[]{false, false});
         }
         else if (cursor.getXValue() == board.getWidth() / 2){
-            gi.animate((ImageView) pane.getChildren().get(1),(ImageView) pane.getChildren().get(2),3,false);
+            GameInterface.animate((ImageView) pane.getChildren().get(1),(ImageView) pane.getChildren().get(2),3,false);
         }
-        gi.updateTI((ImageView) pane.getChildren().get(2),board.get(cursor.getSquare()).getTerrain().defToString(),board.get(cursor.getSquare()).getTerrain().avoToString(),board.get(cursor.getSquare()).getTerrain().toString());
+        GameInterface.updateTI((ImageView) pane.getChildren().get(2),board.get(cursor.getSquare()).getTerrain().defToString(),board.get(cursor.getSquare()).getTerrain().avoToString(),board.get(cursor.getSquare()).getTerrain().toString());
     }
     private void moveRight() throws IOException {
         cursor.moveRight();
         cursor.endMove();
         if (cursor.getXValue() == board.getWidth() / 2 + 1 && cursor.getYValue() < board.getHeight() / 2) {
 
-            gi.animate(
+            GameInterface.animate(
                     new ImageView[]{
                             (ImageView) pane.getChildren().get(1),
                             (ImageView) pane.getChildren().get(2),
@@ -93,11 +92,11 @@ public class UnitSelectionState implements GameState{
                     new boolean[]{true, true});
         }
         else if (cursor.getXValue() == board.getWidth() / 2 + 1)
-            gi.animate((ImageView) pane.getChildren().get(1),(ImageView) pane.getChildren().get(2),3,true);
-        gi.updateTI((ImageView) pane.getChildren().get(2),board.get(cursor.getSquare()).getTerrain().defToString(),board.get(cursor.getSquare()).getTerrain().avoToString(),board.get(cursor.getSquare()).getTerrain().toString());
+            GameInterface.animate((ImageView) pane.getChildren().get(1),(ImageView) pane.getChildren().get(2),3,true);
+        GameInterface.updateTI((ImageView) pane.getChildren().get(2),board.get(cursor.getSquare()).getTerrain().defToString(),board.get(cursor.getSquare()).getTerrain().avoToString(),board.get(cursor.getSquare()).getTerrain().toString());
     }
     public void transitionIn(){
-        gi.transitionIn(
+        GameInterface.transitionIn(
                 new ImageView[]{
                         (ImageView) pane.getChildren().get(1),
                         (ImageView) pane.getChildren().get(2),
@@ -108,7 +107,7 @@ public class UnitSelectionState implements GameState{
     }
     public void next(){
         if (cursor.getUnit() == null || !cursor.getUnit().getColor().equals("blue")) return;
-        gi.transitionOut(
+        GameInterface.transitionOut(
                 new ImageView[]{
                         (ImageView) pane.getChildren().get(1),
                         (ImageView) pane.getChildren().get(2),
@@ -123,7 +122,7 @@ public class UnitSelectionState implements GameState{
 
                 });
         cursor.getIMV().setTranslateY(cursor.getYValue() * tileSize - tileSize / 2 - tileSize / 16);
-        context.setCurrentState(new UnitMoveState(cursor,gi,objectives));
+        context.setCurrentState(new UnitMoveState(cursor,objectives));
 
     }
     public void prev(){}

@@ -11,11 +11,6 @@ public class Vulnerary extends Consumable{
     }
 
     @Override
-    public Image getIcon() {
-        return null;
-    }
-
-    @Override
     public void effect() {
 
     }

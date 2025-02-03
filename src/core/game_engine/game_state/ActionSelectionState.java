@@ -16,15 +16,13 @@ import static core.game_engine.Battle.BattleEngine.*;
 public class ActionSelectionState implements GameState{
     private final Cursor cursor;
     private MenuSelector selector;
-    private final GameInterface gi;
     private final String objectives;
     private ColorTilesAnimation colorTilesAnimation;
     private GameStateContext context;
     String[] menu;
 
-    ActionSelectionState(Cursor cursor, GameInterface gi, String objectives) throws IOException {
+    ActionSelectionState(Cursor cursor, String objectives) throws IOException {
         this.cursor = cursor;
-        this.gi = gi;
         this.objectives = objectives;
         transitionIn();
     }
@@ -64,7 +62,7 @@ public class ActionSelectionState implements GameState{
         if (!cursor.getSelectedUnit().findAlliesInReach().isEmpty()) isNextToAllies = true;
 
         menu = buildMenu(isNextToEnemies,isNextToAllies);
-        ImageView intermediateMenu = gi.drawIntermediateMenu(menu);
+        ImageView intermediateMenu = GameInterface.drawIntermediateMenu(menu);
 
         if (cursor.getXValue() > getBoard().getWidth()/2) intermediateMenu.setTranslateX(3*tileSize / 4);
         else intermediateMenu.setTranslateX(getBoard().getWidth()*tileSize - 4*tileSize + tileSize/4);
@@ -86,7 +84,9 @@ public class ActionSelectionState implements GameState{
         //getOverlayPane().getChildren().removeLast();
         switch (menu[(int)(selector.getTranslateY()-(getOverlayPane().getChildren().get(1)).getTranslateY())/tileSize]){
             case "Attack":
-                System.out.println("Attack");
+                getOverlayPane().getChildren().removeLast();
+                getOverlayPane().getChildren().removeLast();
+                context.setCurrentState(new WeaponSelectionState(cursor,objectives));
                 break;
             case "Support":
                 System.out.println("Support");
@@ -112,7 +112,7 @@ public class ActionSelectionState implements GameState{
         cursor.getIMV().setOpacity(1);
         getOverlayPane().getChildren().removeLast();
         getOverlayPane().getChildren().removeLast();
-        context.setCurrentState(new UnitMoveState(cursor,gi,objectives));
+        context.setCurrentState(new UnitMoveState(cursor,objectives));
     }
     private String[] buildMenu(boolean isNextToEnemy, boolean isNextToAlly){
         StringBuilder menu = new StringBuilder();

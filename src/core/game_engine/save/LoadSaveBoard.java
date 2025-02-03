@@ -35,7 +35,7 @@ public class LoadSaveBoard {
                 assert unit != null;
                 unit.setLeader(true);
             }
-            board.setUnit(unit,(short)Integer.parseInt(line[4]),(short)Integer.parseInt(line[5]));
+            board.setUnit(unit,(byte)Integer.parseInt(line[4]),(byte)Integer.parseInt(line[5]));
         }
     }
 
@@ -49,11 +49,6 @@ public class LoadSaveBoard {
     }
     private Unit loadUnit(String[] line, int[] unitStats){
         return null;
-    }
-
-    public static void main(String[] args) throws Exception {
-
-        //new LoadSave("CH1").loadBoard();
     }
 }
 

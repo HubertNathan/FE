@@ -1,9 +1,10 @@
 package units;
 
 import core.*;
+import core.game_engine.helper_functions.Coord;
+import core.game_engine.helper_functions.Stats;
 import gui.Animations.SpriteAnimation;
 import gui.Battle;
-import gui.ResizableImage;
 import core.game_engine.Battle.BattleEngine;
 import core.game_engine.helper_functions.Dijkstra;
 import Items.Weapons.Weapon;
@@ -25,15 +26,13 @@ import static core.game_engine.Battle.BattleEngine.tileSize;
 public abstract class Unit extends Pane {
     protected Stats stats;
     protected String name;
-    protected short health;
+    protected byte health;
     protected String unitType;
-    protected HashMap<String,Pair<ResizableImage,ResizableImage>> Sprites;
-    protected short x, y, lastX,lastY;
-    protected short attack_range = 1;
+    protected byte x, y, lastX,lastY;
+    protected byte attack_range = 1;
     private final Board board = BattleEngine.getBoard();
     protected boolean isLeader = false, isSelected = false;
     protected String mode = "standing", color = "blue";
-    protected boolean isEnemy = false;
     protected ArrayList<Coord> availableMoves, squaresInRange;
     protected ImageView imv;
     protected Weapon wieldedWeapon;
@@ -44,10 +43,10 @@ public abstract class Unit extends Pane {
     protected boolean promoted = false;
     protected boolean boss = false;
     protected int xp = 0;
-    protected  short classPower = 3;
-    Animation spriteAnimation;
+    protected  byte classPower = 3;
+    SpriteAnimation spriteAnimation;
 
-    Unit(String name, String color, short[] stats, Inventory inventory) throws IOException {
+    Unit(String name, String color, byte[] stats, Inventory inventory) throws IOException {
         this.inventory = inventory;
         this.color = color;
         wieldedWeapon = inventory.getWeapons().getFirst();
@@ -55,15 +54,14 @@ public abstract class Unit extends Pane {
         this.name = name;
         load();
     }
-    Unit(String name, String color, short[] stats, Weapon weapon) throws IOException {
+    Unit(String name, String color, byte[] stats, Weapon weapon) throws IOException {
         wieldedWeapon = weapon;
         this.color = color;
         this.name = name;
         this.stats = new Stats(stats);
-        //load();
     }
     public boolean addXP(Unit enemy, boolean hit, boolean kill){
-        short modeDivisor = 2;
+        byte modeDivisor = 2;
         if (hit) xp+=1;
         else {
             xp += Math.max(0,(int) Math.ceil((31 + enemy.getLVL() + (enemy.isPromoted()?20:0)- stats.getLVL() - (promoted?20:0))/(double)classPower));
@@ -90,12 +88,7 @@ public abstract class Unit extends Pane {
     public String getSkin() {
         return skin;
     }
-    public Image getSprites(){
-        if (mode.equals(STANDING)){
-            return Sprites.get(color).getKey();
-        }
-        return Sprites.get(color).getValue();
-    }
+    public abstract Image getSprites();
     public Inventory getInventory(){
         return inventory;
     }
@@ -108,7 +101,7 @@ public abstract class Unit extends Pane {
     public void setBoss(boolean boss) {
         this.boss = boss;
     }
-    public short getClassPower(){
+    public byte getClassPower(){
         return classPower;
     }
     public void equipWeapon(Weapon weapon){
@@ -128,16 +121,16 @@ public abstract class Unit extends Pane {
     public void setImv(ImageView imv){
         this.imv = imv;
     }
-    public int animation(int animFrame, boolean select, boolean moving) {
-        if (select) return ((animFrame >= 20) ? 1 : 0) + ((animFrame >= 24) ? 1 : 0) - ((animFrame >= 44) ? 1 : 0);
-        if (moving) return ((animFrame >= 12) ? 1 : 0) + ((animFrame >= 18) ? 1 : 0) + ((animFrame >= 30) ? 1 : 0);
-        else return ((animFrame >= 32) ? 1 : 0) + ((animFrame >= 36) ? 1 : 0) - ((animFrame >= 68) ? 1 : 0);
+    public byte animation(int animFrame, boolean select, boolean moving) {
+        if (select) return (byte)(((animFrame >= 20) ? 1 : 0) + ((animFrame >= 24) ? 1 : 0) - ((animFrame >= 44) ? 1 : 0));
+        if (moving) return (byte)(((animFrame >= 12) ? 1 : 0) + ((animFrame >= 18) ? 1 : 0) + ((animFrame >= 30) ? 1 : 0));
+        else return (byte)(((animFrame >= 32) ? 1 : 0) + ((animFrame >= 36) ? 1 : 0) - ((animFrame >= 68) ? 1 : 0));
     }
     public String getResourceDirectory(){
         return getBaseResourceDirectory()+"Battle Animations/"+getSkin()+"/"+getWieldedWeapon().getType();
     }
     protected abstract String getBaseResourceDirectory();
-    public int animation(int animFrame){
+    public byte animation(int animFrame){
         if (mode.equals("standing")){
             return animation((2*animFrame)%72, false,false);
         }
@@ -195,17 +188,17 @@ public abstract class Unit extends Pane {
     private int distanceTo(Square square){
         return Math.abs(square.getXValue() - this.getXValue()) + Math.abs(square.getYValue() - this.getYValue());
     }
-    public void setX(short x){
+    public void setX(byte x){
         this.x = x;
     }
 
-    public void setY(short y) {
+    public void setY(byte y) {
         this.y = y;
     }
-    public int getXValue(){
+    public byte getXValue(){
         return x;
     }
-    public int getYValue(){
+    public byte getYValue(){
         return y;
     }
     public Coord getPosition(){
@@ -216,18 +209,18 @@ public abstract class Unit extends Pane {
     }
     public ArrayList<Unit> findEnemiesInReach(){
         ArrayList<Unit> AdjacentUnits = new ArrayList<>();
-        if (y>0 && board.get(y-1,x).getUnit() != null && board.get(y-1,x).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y-1,x).getUnit());
-        if (y< board.getHeight() - 1 && board.get(y+1,x).getUnit() != null && board.get(y+1,x).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y+1,x).getUnit());
-        if (x>0&&board.get(y,x-1).getUnit() != null&& board.get(y,x-1).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y,x-1).getUnit());
-        if (x<board.getWidth()-1&&board.get(y,x+1).getUnit() != null&& board.get(y,x+1).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y,x+1).getUnit());
+        if (y>0 && board.get((byte) (y-1),x).getUnit() != null && board.get((byte) (y-1),x).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get((byte) (y-1),x).getUnit());
+        if (y< board.getHeight() - 1 && board.get((byte) (y+1),x).getUnit() != null && board.get((byte) (y+1),x).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get((byte) (y+1),x).getUnit());
+        if (x>0&&board.get(y, (byte) (x-1)).getUnit() != null&& board.get(y, (byte) (x-1)).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y, (byte) (x-1)).getUnit());
+        if (x<board.getWidth()-1&&board.get(y, (byte) (x+1)).getUnit() != null&& board.get(y, (byte) (x+1)).getUnit().getColor().equals("red")) AdjacentUnits.add(board.get(y, (byte) (x+1)).getUnit());
         return AdjacentUnits;
     }
     public ArrayList<Unit> findAlliesInReach(){
         ArrayList<Unit> AdjacentUnits = new ArrayList<>();
-        if (y>0 && board.get(y-1,x).getUnit() != null && board.get(y-1,x).getUnit().getColor().equals("blue")) AdjacentUnits.add(board.get(y-1,x).getUnit());
-        if (y< board.getHeight() - 1 && board.get(y+1,x).getUnit() != null && board.get(y+1,x).getUnit().getColor().equals("blue")) AdjacentUnits.add(board.get(y+1,x).getUnit());
-        if (x>0&&board.get(y,x-1).getUnit() != null&& board.get(y,x-1).getUnit().getColor().equals("blue")) AdjacentUnits.add(board.get(y,x-1).getUnit());
-        if (x<board.getWidth()-1&&board.get(y,x+1).getUnit() != null&& board.get(y,x+1).getUnit().getColor().equals("blue")) AdjacentUnits.add(board.get(y,x+1).getUnit());
+        if (y>0 && board.get((byte) (y-1),x).getUnit() != null && board.get((byte) (y-1),x).getUnit().getColor().equals("blue")) AdjacentUnits.add(board.get((byte) (y-1),x).getUnit());
+        if (y< board.getHeight() - 1 && board.get((byte) (y+1),x).getUnit() != null && board.get((byte) (y+1),x).getUnit().getColor().equals("blue")) AdjacentUnits.add(board.get((byte) (y+1),x).getUnit());
+        if (x>0&&board.get(y, (byte) (x-1)).getUnit() != null&& board.get(y, (byte) (x-1)).getUnit().getColor().equals("blue")) AdjacentUnits.add(board.get(y, (byte) (x-1)).getUnit());
+        if (x<board.getWidth()-1&&board.get(y, (byte) (x+1)).getUnit() != null&& board.get(y, (byte) (x+1)).getUnit().getColor().equals("blue")) AdjacentUnits.add(board.get(y, (byte) (x+1)).getUnit());
         return AdjacentUnits;
     }
     public void setLeader(boolean isLeader){
@@ -299,8 +292,11 @@ public abstract class Unit extends Pane {
     }
 
 
-    public Animation getSpriteAnimation(){
+    public Animation startSpriteAnimation(){
         spriteAnimation = new SpriteAnimation(this, imv){{setCycleCount(INDEFINITE);}};
+        return spriteAnimation;
+    }
+    public SpriteAnimation getSpriteAnimation(){
         return spriteAnimation;
     }
     public void die(){
@@ -332,45 +328,45 @@ public abstract class Unit extends Pane {
     public void newTurn(){
         imv.setEffect(null);
     }
-    public short getHealth(){
+    public byte getHealth(){
         return health;
     }
-    public void setHealth(short health){
+    public void setHealth(byte health){
         this.health = health;
     }
 
 
-    public short getLVL(){
+    public byte getLVL(){
         return stats.getLVL();
     }
-    public short getHP() {
+    public byte getHP() {
         return stats.getHP();
     }
-    public short getStr(){
+    public byte getStr(){
         return stats.getStr();
     }
-    public short getMag() {
+    public byte getMag() {
         return stats.getMag();
     }
-    public short getSkl() {
+    public byte getSkl() {
         return stats.getSkl();
     }
-    public short getSpd() {
+    public byte getSpd() {
         return stats.getSpd();
     }
-    public short getLck() {
+    public byte getLck() {
         return stats.getLck();
     }
-    public short getDef() {
+    public byte getDef() {
         return stats.getLck();
     }
-    public short getRes() {
+    public byte getRes() {
         return stats.getRes();
     }
-    public short getCon() {
+    public byte getCon() {
         return stats.getCon();
     }
-    public void setHP(short HP) {
+    public void setHP(byte HP) {
         this.stats.setHP(HP);
     }
 

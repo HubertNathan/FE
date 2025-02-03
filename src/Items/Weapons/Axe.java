@@ -1,6 +1,9 @@
 package Items.Weapons;
 
-import gui.ResizableImage;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,9 +44,24 @@ public class Axe extends Weapon {
             case Basilikos -> 143;
             default -> -1;
         };
-        ResizableImage symbols = new ResizableImage("file:Resources/FE7Symbols.png", 472, 274);
-        icon = symbols.getSubimage(302 * 6 + (id % 10) * 17 * 6, 6 + (id / 10) * 6 * 17, 16 * 6, 16 * 6);
-        weaponType = symbols.getSubimage(249*6,6,15*6,15*6);
+        GraphicsContext gc = new Canvas(16*6,16*6).getGraphicsContext2D();
+        gc.setImageSmoothing(false);
+        gc.drawImage(
+                icons,
+                302 + (id%10)*17, 1+(id/10)*17,
+                16,16,
+                0,0,
+                16*6,16*6
+        );
+        icon = gc.getCanvas().snapshot(new SnapshotParameters(){{setFill(Color.TRANSPARENT);}}, null);
+        gc.drawImage(
+                icons,
+                217,1,
+                15,15,
+                0,0,
+                15*6,15*6
+        );
+        weaponType = gc.getCanvas().snapshot(new SnapshotParameters(){{setFill(Color.TRANSPARENT);}}, null);
         //302*6+id%10*16*6,(id/10)*6,16*6,16*6
     }
 

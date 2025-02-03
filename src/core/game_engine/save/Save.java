@@ -71,6 +71,5 @@ public class Save {
         if (saveFile.delete()) System.out.println("Save "+i+" was deleted");;
     }
     public static void main(String[] args) throws IOException {
-        System.out.println(loadTime(1));
     }
 }

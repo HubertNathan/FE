@@ -1,6 +1,7 @@
 package Items.Weapons;
 
 import Items.Item;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 import java.io.IOException;
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import static core.game_engine.Battle.BattleEngine.tileSize;
 
 public abstract class Weapon implements Item {
     protected String name;
@@ -88,6 +91,7 @@ public abstract class Weapon implements Item {
         put(Axe.Basilikos,      new ArrayList<>(Arrays.asList("S","1","25","13","22","75","0","1","15000","For experienced units only")));
     }};
     Weapon(String name, String rank, String type, List<Integer> Stats){
+        System.out.println(name);
         this.name = name;
         this.rank = rank;
         this.type = type;
@@ -115,6 +119,7 @@ public abstract class Weapon implements Item {
         cost = Stats.removeFirst();
     }
     Weapon(String name, String type) {
+        System.out.println(name);
         this.name = name;
         this.type = type;
         List<String> Stats = switch (type) {
@@ -163,10 +168,20 @@ public abstract class Weapon implements Item {
     }
     public int getPrice(){return cost;}
 
-    public Image getIcon() {
-        return icon;
+    public void drawIcon(GraphicsContext g, double x, double y) {
+        g.drawImage(icon,
+                0,0,
+                icon.getWidth(),icon.getHeight(),
+                x,y,
+                tileSize,tileSize);
+
     }
-    public Image getWeaponType() {
-        return weaponType;
+    public void drawWeaponType(GraphicsContext g, double x, double y){
+        g.drawImage(weaponType,
+                0,0,
+                weaponType.getWidth(),weaponType.getHeight(),
+                x,y,
+                tileSize,tileSize
+                );
     }
 }
